@@ -1391,6 +1391,15 @@ export class ActualBudget implements INodeType {
 								});
 								result = { success: true };
 								break;
+							case 'load':
+								const budgetIdForLoad = this.getNodeParameter('budgetId', i) as string;
+								await api.loadBudget(budgetIdForLoad);
+								result = { success: true };
+								break;
+							case 'download':
+								const budgetIdForDownload = this.getNodeParameter('budgetId', i) as string;
+								result = await api.downloadBudget(budgetIdForDownload);
+								break;
 							default:
 								throw new NodeApiError(this.getNode(), {
 									message: `Unknown operation ${operation} for resource ${resource}`,
