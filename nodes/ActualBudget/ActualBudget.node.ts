@@ -1406,6 +1406,46 @@ export class ActualBudget implements INodeType {
 								});
 						}
 						break;
+					case 'transaction':
+						switch (operation) {
+							case 'getAll':
+								const accountId = this.getNodeParameter('accountId', i) as string;
+								const startDate = this.getNodeParameter('startDate', i) as string;
+								const endDate = this.getNodeParameter('endDate', i) as string;
+								result = await api.getTransactions(accountId, startDate, endDate);
+								break;
+							case 'add':
+								const accountIdForAdd = this.getNodeParameter('accountId', i) as string;
+								const transactionsForAdd = this.getNodeParameter('transactions', i) as any[];
+								result = await api.addTransactions(accountIdForAdd, transactionsForAdd);
+								break;
+							case 'import':
+								const accountIdForImport = this.getNodeParameter('accountId', i) as string;
+								const transactionsForImport = this.getNodeParameter('transactions', i) as any[];
+								await api.importTransactions(accountIdForImport, transactionsForImport);
+								result = { success: true };
+								break;
+							case 'update':
+								const transactionIdForUpdate = this.getNodeParameter('transactionId', i) as string;
+								const fieldsForUpdate = {
+									payee: this.getNodeParameter('payeeId', i) as string,
+									category: this.getNodeParameter('categoryId', i) as string,
+									notes: this.getNodeParameter('notes', i) as string,
+									amount: this.getNodeParameter('amount', i) as number,
+								};
+								result = await api.updateTransaction(transactionIdForUpdate, fieldsForUpdate);
+								break;
+							case 'delete':
+								const transactionIdForDelete = this.getNodeParameter('transactionId', i) as string;
+								await api.deleteTransaction(transactionIdForDelete);
+								result = { success: true };
+								break;
+							default:
+								throw new NodeApiError(this.getNode(), {
+									message: `Unknown operation ${operation} for resource ${resource}`,
+								});
+						}
+						break;
 					// Add other resource cases here
 					default:
 						throw new NodeApiError(this.getNode(), { message: `Unknown resource ${resource}` });
