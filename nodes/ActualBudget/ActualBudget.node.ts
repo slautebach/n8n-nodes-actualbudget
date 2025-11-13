@@ -1,5 +1,6 @@
 import * as crypto from 'crypto';
 import * as fs from 'fs';
+import * as os from 'os';
 import {
 	IExecuteFunctions,
 	ILoadOptionsFunctions,
@@ -25,11 +26,14 @@ export class ActualBudget implements INodeType {
 		if (!serverURL) {
 			throw new NodeApiError(this.getNode(), { message: 'Server URL is not set in credentials' });
 		}
-		const dataDir = `${process.env.N8N_USER_FOLDER}/actual-data/${crypto
+		let baseDir = process.env.N8N_USER_FOLDER;
+		if (!baseDir) {
+			baseDir = `${os.homedir()}/.n8n`;
+		}
+		const dataDir = `${baseDir}/actual-data/${crypto
 			.createHash('md5')
 			.update(serverURL)
 			.digest('hex')}`;
-
 		if (!fs.existsSync(dataDir)) {
 			fs.mkdirSync(dataDir, { recursive: true });
 		}
