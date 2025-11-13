@@ -16,7 +16,7 @@ import * as api from '@actual-app/api';
 export class ActualBudget implements INodeType {
 	static async initApiClient(this: IExecuteFunctions | ILoadOptionsFunctions | IHookFunctions) {
 		const credentials = await this.getCredentials('actualBudgetApi');
-		const { url: serverURL, password } = credentials as { url: string; password: string };
+		const { serverURL, password } = credentials as { serverURL: string; password: string };
 		const dataDir = `${process.env.N8N_USER_FOLDER}/actual-data/${crypto
 			.createHash('md5')
 			.update(serverURL)
@@ -1202,29 +1202,30 @@ export class ActualBudget implements INodeType {
 				await ActualBudget.initApiClient.call(this);
 				try {
 					const accounts = await api.getAccounts();
-					          return accounts.map((account) => ({
-					            name: account.name,
-					            value: account.id,
-					          }));
-					        } catch (error) {
-					          throw new NodeApiError(this.getNode(), { message: (error as Error).message });
-					        } finally {					await ActualBudget.shutdownApiClient.call(this);
+					return accounts.map((account) => ({
+						name: account.name,
+						value: account.id,
+					}));
+				} catch (error) {
+					throw new NodeApiError(this.getNode(), { message: (error as Error).message });
+				} finally {
+					await ActualBudget.shutdownApiClient.call(this);
 				}
 			},
-						async getCategories(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-							await ActualBudget.initApiClient.call(this);
-							try {
-								const categories = await api.getCategories();
-								return categories.map((category) => ({
-									name: category.name,
-									value: category.id,
-								}));
-							} catch (error) {
-								throw new NodeApiError(this.getNode(), { message: (error as Error).message });
-							} finally {
-								await ActualBudget.shutdownApiClient.call(this);
-							}
-						},
+			async getCategories(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				await ActualBudget.initApiClient.call(this);
+				try {
+					const categories = await api.getCategories();
+					return categories.map((category) => ({
+						name: category.name,
+						value: category.id,
+					}));
+				} catch (error) {
+					throw new NodeApiError(this.getNode(), { message: (error as Error).message });
+				} finally {
+					await ActualBudget.shutdownApiClient.call(this);
+				}
+			},
 			async getCategoryGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				await ActualBudget.initApiClient.call(this);
 				try {
@@ -1243,26 +1244,28 @@ export class ActualBudget implements INodeType {
 				await ActualBudget.initApiClient.call(this);
 				try {
 					const payees = await api.getPayees();
-					          return payees.map((payee) => ({
-					            name: payee.name,
-					            value: payee.id,
-					          }));
-					        } catch (error) {
-					          throw new NodeApiError(this.getNode(), { message: (error as Error).message });
-					        } finally {					await ActualBudget.shutdownApiClient.call(this);
+					return payees.map((payee) => ({
+						name: payee.name,
+						value: payee.id,
+					}));
+				} catch (error) {
+					throw new NodeApiError(this.getNode(), { message: (error as Error).message });
+				} finally {
+					await ActualBudget.shutdownApiClient.call(this);
 				}
 			},
 			async getRules(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				await ActualBudget.initApiClient.call(this);
 				try {
 					const rules = await api.getRules();
-					                    return rules.map((rule) => ({
-					                        name: rule.id, // Rules don't have a name, using ID for now
-					                        value: rule.id,
-					                    }));
-					                } catch (error) {
-					                    throw new NodeApiError(this.getNode(), { message: (error as Error).message });
-					                } finally {					await ActualBudget.shutdownApiClient.call(this);
+					return rules.map((rule) => ({
+						name: rule.id, // Rules don't have a name, using ID for now
+						value: rule.id,
+					}));
+				} catch (error) {
+					throw new NodeApiError(this.getNode(), { message: (error as Error).message });
+				} finally {
+					await ActualBudget.shutdownApiClient.call(this);
 				}
 			},
 			async getSchedules(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -1271,59 +1274,60 @@ export class ActualBudget implements INodeType {
 					const schedules = await api.getSchedules();
 					return schedules.map((schedule) => ({
 						name: schedule.id, // Schedules don't have a name, using ID for now
-											value: schedule.id,
-										}));
-									} catch (error) {
-										throw new NodeApiError(this.getNode(), { message: (error as Error).message });
-									} finally {
-										await ActualBudget.shutdownApiClient.call(this);
-									}
-								},
-							},
-						};
-						
-						async execute(this: IExecuteFunctions): Promise<any> {
-							const items = this.getInputData();
-							const returnData = [];
-						
-							for (let i = 0; i < items.length; i++) {
-								const resource = this.getNodeParameter('resource', i) as string;
-								const operation = this.getNodeParameter('operation', i) as string;
-						
-								await ActualBudget.initApiClient.call(this);
-						
-								try {
-									let result: any;
-						
-									switch (resource) {
-										case 'account':
-											switch (operation) {
-												case 'getAll':
-													result = await api.getAccounts();
-													break;
-												// Add other account operations here
-												default:
-													throw new NodeApiError(this.getNode(), { message: `Unknown operation ${operation} for resource ${resource}` });
-											}
-											break;
-										// Add other resource cases here
-										default:
-											throw new NodeApiError(this.getNode(), { message: `Unknown resource ${resource}` });
-									}
-						
-									returnData.push({ json: { data: result } });
-								} catch (error) { {
-										if (this.continueOnFail()) {
-											returnData.push({ json: { error: (error as Error).message } });
-											continue;
-										}
-										throw error;
-									}
-								} finally {
-									await ActualBudget.shutdownApiClient.call(this);
-								}
-							}
-						
-							return [this.helpers.returnJsonArray(returnData)];
+						value: schedule.id,
+					}));
+				} catch (error) {
+					throw new NodeApiError(this.getNode(), { message: (error as Error).message });
+				} finally {
+					await ActualBudget.shutdownApiClient.call(this);
+				}
+			},
+		},
+	};
+
+	async execute(this: IExecuteFunctions): Promise<any> {
+		const items = this.getInputData();
+		const returnData = [];
+
+		for (let i = 0; i < items.length; i++) {
+			const resource = this.getNodeParameter('resource', i) as string;
+			const operation = this.getNodeParameter('operation', i) as string;
+
+			await ActualBudget.initApiClient.call(this);
+
+			try {
+				let result: any;
+
+				switch (resource) {
+					case 'account':
+						switch (operation) {
+							case 'getAll':
+								result = await api.getAccounts();
+								break;
+							// Add other account operations here
+							default:
+								throw new NodeApiError(this.getNode(), { message: `Unknown operation ${operation} for resource ${resource}` });
 						}
-						}
+						break;
+					// Add other resource cases here
+					default:
+						throw new NodeApiError(this.getNode(), { message: `Unknown resource ${resource}` });
+				}
+
+				returnData.push({ json: { data: result } });
+			} catch (error) {
+				{
+					if (this.continueOnFail()) {
+						returnData.push({ json: { error: (error as Error).message } });
+						continue;
+					}
+					throw error;
+				}
+			} finally {
+				await ActualBudget.shutdownApiClient.call(this);
+			}
+		}
+
+		return [this.helpers.returnJsonArray(returnData)];
+	}
+}
