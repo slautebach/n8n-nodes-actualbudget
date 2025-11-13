@@ -1243,7 +1243,9 @@ export class ActualBudget implements INodeType {
 						value: account.id,
 					}));
 				} catch (error) {
-					throw new NodeApiError(this.getNode(), { message: (error as Error).message });
+					throw new NodeApiError(this.getNode(), {
+						message: `Error fetching accounts: ${(error as Error).message}`,
+					});
 				} finally {
 					await ActualBudget.shutdownApiClient.call(this);
 				}
@@ -1257,7 +1259,9 @@ export class ActualBudget implements INodeType {
 						value: category.id,
 					}));
 				} catch (error) {
-					throw new NodeApiError(this.getNode(), { message: (error as Error).message });
+					throw new NodeApiError(this.getNode(), {
+						message: `Error fetching categories: ${(error as Error).message}`,
+					});
 				} finally {
 					await ActualBudget.shutdownApiClient.call(this);
 				}
@@ -1271,7 +1275,9 @@ export class ActualBudget implements INodeType {
 						value: categoryGroup.id,
 					}));
 				} catch (error) {
-					throw new NodeApiError(this.getNode(), { message: (error as Error).message });
+					throw new NodeApiError(this.getNode(), {
+						message: `Error fetching category groups: ${(error as Error).message}`,
+					});
 				} finally {
 					await ActualBudget.shutdownApiClient.call(this);
 				}
@@ -1285,7 +1291,9 @@ export class ActualBudget implements INodeType {
 						value: payee.id,
 					}));
 				} catch (error) {
-					throw new NodeApiError(this.getNode(), { message: (error as Error).message });
+					throw new NodeApiError(this.getNode(), {
+						message: `Error fetching payees: ${(error as Error).message}`,
+					});
 				} finally {
 					await ActualBudget.shutdownApiClient.call(this);
 				}
@@ -1299,7 +1307,9 @@ export class ActualBudget implements INodeType {
 						value: rule.id,
 					}));
 				} catch (error) {
-					throw new NodeApiError(this.getNode(), { message: (error as Error).message });
+					throw new NodeApiError(this.getNode(), {
+						message: `Error fetching rules: ${(error as Error).message}`,
+					});
 				} finally {
 					await ActualBudget.shutdownApiClient.call(this);
 				}
@@ -1313,7 +1323,9 @@ export class ActualBudget implements INodeType {
 						value: schedule.id,
 					}));
 				} catch (error) {
-					throw new NodeApiError(this.getNode(), { message: (error as Error).message });
+					throw new NodeApiError(this.getNode(), {
+						message: `Error fetching schedules: ${(error as Error).message}`,
+					});
 				} finally {
 					await ActualBudget.shutdownApiClient.call(this);
 				}
