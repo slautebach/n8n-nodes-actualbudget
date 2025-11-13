@@ -16,7 +16,15 @@ import * as api from '@actual-app/api';
 export class ActualBudget implements INodeType {
 	static async initApiClient(this: IExecuteFunctions | ILoadOptionsFunctions | IHookFunctions) {
 		const credentials = await this.getCredentials('actualBudgetApi');
+		if (credentials === undefined) {
+			throw new NodeApiError(this.getNode(), {
+				message: 'No credentials found for Actual Budget API',
+			});
+		}
 		const { serverURL, password } = credentials as { serverURL: string; password: string };
+		if (!serverURL) {
+			throw new NodeApiError(this.getNode(), { message: 'Server URL is not set in credentials' });
+		}
 		const dataDir = `${process.env.N8N_USER_FOLDER}/actual-data/${crypto
 			.createHash('md5')
 			.update(serverURL)
@@ -122,7 +130,17 @@ export class ActualBudget implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
-						resource: ['account', 'budget', 'category', 'categoryGroup', 'payee', 'rule', 'schedule', 'transaction', 'utility'],
+						resource: [
+							'account',
+							'budget',
+							'category',
+							'categoryGroup',
+							'payee',
+							'rule',
+							'schedule',
+							'transaction',
+							'utility',
+						],
 					},
 				},
 			},
@@ -183,7 +201,8 @@ export class ActualBudget implements INodeType {
 					loadOptionsMethod: 'getAccounts',
 				},
 				default: '',
-				description: 'The ID of the account to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+				description:
+					'The ID of the account to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 				displayOptions: {
 					show: {
 						resource: ['account'],
@@ -374,7 +393,8 @@ export class ActualBudget implements INodeType {
 					loadOptionsMethod: 'getCategories',
 				},
 				default: '',
-				description: 'The ID of the category to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+				description:
+					'The ID of the category to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 				displayOptions: {
 					show: {
 						resource: ['budget'],
@@ -463,7 +483,8 @@ export class ActualBudget implements INodeType {
 					loadOptionsMethod: 'getCategories',
 				},
 				default: '',
-				description: 'The ID of the category to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+				description:
+					'The ID of the category to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 				displayOptions: {
 					show: {
 						resource: ['category'],
@@ -492,7 +513,8 @@ export class ActualBudget implements INodeType {
 					loadOptionsMethod: 'getCategoryGroups',
 				},
 				default: '',
-				description: 'The ID of the category group the category belongs to. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+				description:
+					'The ID of the category group the category belongs to. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 				displayOptions: {
 					show: {
 						resource: ['category'],
@@ -542,7 +564,8 @@ export class ActualBudget implements INodeType {
 					loadOptionsMethod: 'getCategoryGroups',
 				},
 				default: '',
-				description: 'The ID of the category group to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+				description:
+					'The ID of the category group to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 				displayOptions: {
 					show: {
 						resource: ['categoryGroup'],
@@ -615,7 +638,8 @@ export class ActualBudget implements INodeType {
 					loadOptionsMethod: 'getPayees',
 				},
 				default: '',
-				description: 'The ID of the payee to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+				description:
+					'The ID of the payee to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 				displayOptions: {
 					show: {
 						resource: ['payee'],
@@ -644,7 +668,8 @@ export class ActualBudget implements INodeType {
 					loadOptionsMethod: 'getAccounts',
 				},
 				default: '',
-				description: 'The ID of the transfer account (only for transfer payees). Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+				description:
+					'The ID of the transfer account (only for transfer payees). Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 				displayOptions: {
 					show: {
 						resource: ['payee'],
@@ -660,7 +685,8 @@ export class ActualBudget implements INodeType {
 					loadOptionsMethod: 'getPayees',
 				},
 				default: '',
-				description: 'The ID of the target payee to merge into. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+				description:
+					'The ID of the target payee to merge into. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 				displayOptions: {
 					show: {
 						resource: ['payee'],
@@ -710,7 +736,8 @@ export class ActualBudget implements INodeType {
 					loadOptionsMethod: 'getRules',
 				},
 				default: '',
-				description: 'The ID of the rule to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+				description:
+					'The ID of the rule to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 				displayOptions: {
 					show: {
 						resource: ['rule'],
@@ -832,7 +859,8 @@ export class ActualBudget implements INodeType {
 					loadOptionsMethod: 'getSchedules',
 				},
 				default: '',
-				description: 'The ID of the schedule to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+				description:
+					'The ID of the schedule to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 				displayOptions: {
 					show: {
 						resource: ['schedule'],
@@ -900,7 +928,8 @@ export class ActualBudget implements INodeType {
 					loadOptionsMethod: 'getAccounts',
 				},
 				default: '',
-				description: 'The ID of the account to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+				description:
+					'The ID of the account to operate on. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 				displayOptions: {
 					show: {
 						resource: ['transaction'],
@@ -1036,7 +1065,8 @@ export class ActualBudget implements INodeType {
 					loadOptionsMethod: 'getPayees',
 				},
 				default: '',
-				description: 'The ID of the payee for the transaction. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+				description:
+					'The ID of the payee for the transaction. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 				displayOptions: {
 					show: {
 						resource: ['transaction'],
@@ -1052,7 +1082,8 @@ export class ActualBudget implements INodeType {
 					loadOptionsMethod: 'getCategories',
 				},
 				default: '',
-				description: 'The ID of the category for the transaction. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+				description:
+					'The ID of the category for the transaction. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 				displayOptions: {
 					show: {
 						resource: ['transaction'],
@@ -1128,7 +1159,8 @@ export class ActualBudget implements INodeType {
 					loadOptionsMethod: 'getAccounts',
 				},
 				default: '',
-				description: 'The ID of the account to run bank sync for. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+				description:
+					'The ID of the account to run bank sync for. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 				displayOptions: {
 					show: {
 						resource: ['utility'],
@@ -1306,7 +1338,9 @@ export class ActualBudget implements INodeType {
 								break;
 							// Add other account operations here
 							default:
-								throw new NodeApiError(this.getNode(), { message: `Unknown operation ${operation} for resource ${resource}` });
+								throw new NodeApiError(this.getNode(), {
+									message: `Unknown operation ${operation} for resource ${resource}`,
+								});
 						}
 						break;
 					// Add other resource cases here

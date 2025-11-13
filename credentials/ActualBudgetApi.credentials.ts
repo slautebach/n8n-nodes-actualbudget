@@ -1,8 +1,4 @@
-import {
-	ICredentialTestRequest,
-	ICredentialType,
-	INodeProperties,
-} from 'n8n-workflow';
+import { ICredentialTestRequest, ICredentialType, INodeProperties } from 'n8n-workflow';
 
 export class ActualBudgetApi implements ICredentialType {
 	name = 'actualBudgetApi';
@@ -14,7 +10,7 @@ export class ActualBudgetApi implements ICredentialType {
 			name: 'serverURL',
 			type: 'string',
 			default: '',
-			required: true
+			required: true,
 		},
 		{
 			displayName: 'Password',
@@ -24,8 +20,8 @@ export class ActualBudgetApi implements ICredentialType {
 				password: true,
 			},
 			default: '',
-			required: true
-		}
+			required: true,
+		},
 	];
 
 	test: ICredentialTestRequest = {
