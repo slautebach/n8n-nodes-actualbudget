@@ -16,7 +16,7 @@ import * as api from '@actual-app/api';
 export class ActualBudget implements INodeType {
 	static async initApiClient(this: IExecuteFunctions | ILoadOptionsFunctions | IHookFunctions) {
 		const credentials = await this.getCredentials('actualBudgetApi');
-		const { serverURL, password } = credentials as { serverURL: string; password: string };
+		const { url: serverURL, password } = credentials as { url: string; password: string };
 		const dataDir = `${process.env.N8N_USER_FOLDER}/actual-data/${crypto
 			.createHash('md5')
 			.update(serverURL)
