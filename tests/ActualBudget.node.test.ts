@@ -34,32 +34,10 @@ const createExecuteFunctions = (parameters: { [key: string]: any }) => ({
 	helpers: {
 		returnJsonArray: jest.fn((data) => data),
 	},
+	continueOnFail: jest.fn().mockReturnValue(false),
 } as unknown as IExecuteFunctions);
 
 describe('ActualBudget Node', () => {
-	beforeAll(async () => {
-		try {
-			const dataDirPath = 'tests/dataDir';
-			if (fs.existsSync(dataDirPath)) {
-				fs.rmSync(dataDirPath, { recursive: true, force: true });
-			}
-			fs.mkdirSync(dataDirPath, { recursive: true });
-
-			await api.init({
-				serverURL: process.env.ACTUAL_SERVER_URL,
-				password: process.env.ACTUAL_SERVER_PASSWORD,
-				dataDir: dataDirPath,
-			});
-			await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
-		} catch (error) {
-			console.error('Failed to initialize Actual Budget API:', error);
-			throw error;
-		}
-	});
-
-	afterAll(async () => {
-		await api.shutdown();
-	});
 
 	it('should have a description', () => {
 		const node = new ActualBudget();
@@ -68,6 +46,29 @@ describe('ActualBudget Node', () => {
 
 
 	describe('loadOptions', () => {
+		beforeEach(async () => {
+			try {
+				const dataDirPath = 'tests/dataDir';
+				if (fs.existsSync(dataDirPath)) {
+					fs.rmSync(dataDirPath, { recursive: true, force: true });
+				}
+				fs.mkdirSync(dataDirPath, { recursive: true });
+
+				await api.init({
+					serverURL: process.env.ACTUAL_SERVER_URL,
+					password: process.env.ACTUAL_SERVER_PASSWORD,
+					dataDir: dataDirPath,
+				});
+				await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
+			} catch (error) {
+				console.error('Failed to initialize Actual Budget API:', error);
+				throw error;
+			}
+		});
+
+		afterEach(async () => {
+			await api.shutdown();
+		});
 		describe('Integration Tests', () => {
 			it('getAccounts should return accounts from a live server', async () => {
 				const loadOptionsFunctions = createLoadOptionsFunctions();
@@ -174,21 +175,16 @@ describe('ActualBudget Node', () => {
 					expect(testPayee).toBeDefined();
 					expect(testPayee?.value).toBe(testPayeeId);
 
-				} catch (error) {
-					if (error instanceof NodeApiError) {
-						const errorMessage = (error.cause as Error)?.message || error.message;
-						console.error('Caught NodeApiError:', errorMessage);
-					} else {
-						console.error('Caught unexpected error:', error);
-					}
-					throw error;
-				} finally {
-					if (testPayeeId) {
-						await api.deletePayee(testPayeeId);
-					}
-				}
-			});
-
+				                } catch (error) {
+				                    if (error instanceof NodeApiError) {
+				                        const errorMessage = (error.cause as Error)?.message || error.message;
+				                        console.error('Caught NodeApiError:', errorMessage);
+				                    } else {
+				                        console.error('Caught unexpected error:', error);
+				                    }
+				                    throw error;
+				                }
+				            });
 			it('getRules should return rules from a live server', async () => {
 				const loadOptionsFunctions = createLoadOptionsFunctions();
 				const node = new ActualBudget();
@@ -225,31 +221,17 @@ describe('ActualBudget Node', () => {
 					const testRule = result.find((r) => r.value === testRuleId);
 					expect(testRule).toBeDefined();
 
-				} catch (error) {
-					if (error instanceof NodeApiError) {
-						const errorMessage = (error.cause as Error)?.message || error.message;
-						console.error('Caught NodeApiError:', errorMessage);
-					} else {
-						console.error('Caught unexpected error:', error);
-					}
-					throw error;
-				} finally {
-					// Clean up in reverse order of creation
-					if (testRuleId) {
-						await api.deleteRule(testRuleId);
-					}
-					if (testCategoryId) {
-						await api.deleteCategory(testCategoryId);
-					}
-					if (testGroupId) {
-						await api.deleteCategoryGroup(testGroupId);
-					}
-					if (testPayeeId) {
-						await api.deletePayee(testPayeeId);
-					}
-				}
-			});
-
+				                } catch (error) {
+				                    if (error instanceof NodeApiError) {
+				                        const errorMessage = (error.cause as Error)?.message || error.message;
+				                        console.error('Caught NodeApiError:', errorMessage);
+				                    }
+				                    else {
+				                        console.error('Caught unexpected error:', error);
+				                    }
+				                    throw error;
+				                }
+				            });
 			it('getSchedules should return schedules from a live server', async () => {
 				const loadOptionsFunctions = createLoadOptionsFunctions();
 
@@ -285,31 +267,42 @@ describe('ActualBudget Node', () => {
 					const testSchedule = result.find((s) => s.value === testScheduleId);
 					expect(testSchedule).toBeDefined();
 
-				} catch (error) {
-					if (error instanceof NodeApiError) {
-						const errorMessage = (error.cause as Error)?.message || error.message;
-						console.error('Caught NodeApiError:', errorMessage);
-					} else {
-						console.error('Caught unexpected error:', error);
-					}
-					throw error;
-				} finally {
-					// Clean up
-					if (testScheduleId) {
-						await api.deleteSchedule(testScheduleId);
-					}
-					if (testPayeeId) {
-						await api.deletePayee(testPayeeId);
-					}
-					if (testAccountId) {
-						await api.deleteAccount(testAccountId);
-					}
-				}
-			});
-		});
+				                } catch (error) {
+				                    if (error instanceof NodeApiError) {
+				                        const errorMessage = (error.cause as Error)?.message || error.message;
+				                        console.error('Caught NodeApiError:', errorMessage);
+				                    } else {
+				                        console.error('Caught unexpected error:', error);
+				                    }
+				                    throw error;
+				                }
+				            });		});
 	});
 	describe('execute', () => {
 		describe('Integration Tests', () => {
+			beforeAll(async () => {
+				try {
+					const dataDirPath = 'tests/dataDir';
+					if (fs.existsSync(dataDirPath)) {
+						fs.rmSync(dataDirPath, { recursive: true, force: true });
+					}
+					fs.mkdirSync(dataDirPath, { recursive: true });
+
+					await api.init({
+						serverURL: process.env.ACTUAL_SERVER_URL,
+						password: process.env.ACTUAL_SERVER_PASSWORD,
+						dataDir: dataDirPath,
+					});
+					await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
+				} catch (error) {
+					console.error('Failed to initialize Actual Budget API:', error);
+					throw error;
+				}
+			});
+
+			afterAll(async () => {
+				await api.shutdown();
+			});
 			it('get transactions should return transactions from a live server', async () => {
 				const node = new ActualBudget();
 				let testAccountId: string | null = null;

@@ -1293,7 +1293,6 @@ export class ActualBudget implements INodeType {
 			async getAccounts(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const credentials = await this.getCredentials('actualBudgetApi');
 				const { syncId } = credentials as { syncId: string };
-				await ActualBudget.initApiClient.call(this);
 				if (syncId) {
 					await api.downloadBudget(syncId);
 				}
@@ -1307,8 +1306,6 @@ export class ActualBudget implements INodeType {
 					throw new NodeApiError(this.getNode(), {
 						message: `Error fetching accounts: ${(error as Error).message}`,
 					});
-				} finally {
-					await ActualBudget.shutdownApiClient.call(this);
 				}
 			},
 			/**
@@ -1318,7 +1315,6 @@ export class ActualBudget implements INodeType {
 			async getCategories(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const credentials = await this.getCredentials('actualBudgetApi');
 				const { syncId } = credentials as { syncId: string };
-				await ActualBudget.initApiClient.call(this);
 				if (syncId) {
 					await api.downloadBudget(syncId);
 				}
@@ -1332,8 +1328,6 @@ export class ActualBudget implements INodeType {
 					throw new NodeApiError(this.getNode(), {
 						message: `Error fetching categories: ${(error as Error).message}`,
 					});
-				} finally {
-					await ActualBudget.shutdownApiClient.call(this);
 				}
 			},
 			/**
@@ -1343,7 +1337,6 @@ export class ActualBudget implements INodeType {
 			async getCategoryGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const credentials = await this.getCredentials('actualBudgetApi');
 				const { syncId } = credentials as { syncId: string };
-				await ActualBudget.initApiClient.call(this);
 				if (syncId) {
 					await api.downloadBudget(syncId);
 				}
@@ -1357,8 +1350,6 @@ export class ActualBudget implements INodeType {
 					throw new NodeApiError(this.getNode(), {
 						message: `Error fetching category groups: ${(error as Error).message}`,
 					});
-				} finally {
-					await ActualBudget.shutdownApiClient.call(this);
 				}
 			},
 			/**
@@ -1368,7 +1359,6 @@ export class ActualBudget implements INodeType {
 			async getPayees(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const credentials = await this.getCredentials('actualBudgetApi');
 				const { syncId } = credentials as { syncId: string };
-				await ActualBudget.initApiClient.call(this);
 				if (syncId) {
 					await api.downloadBudget(syncId);
 				}
@@ -1382,8 +1372,6 @@ export class ActualBudget implements INodeType {
 					throw new NodeApiError(this.getNode(), {
 						message: `Error fetching payees: ${(error as Error).message}`,
 					});
-				} finally {
-					await ActualBudget.shutdownApiClient.call(this);
 				}
 			},
 			/**
@@ -1393,7 +1381,6 @@ export class ActualBudget implements INodeType {
 			async getRules(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const credentials = await this.getCredentials('actualBudgetApi');
 				const { syncId } = credentials as { syncId: string };
-				await ActualBudget.initApiClient.call(this);
 				if (syncId) {
 					await api.downloadBudget(syncId);
 				}
@@ -1407,8 +1394,6 @@ export class ActualBudget implements INodeType {
 					throw new NodeApiError(this.getNode(), {
 						message: `Error fetching rules: ${(error as Error).message}`,
 					});
-				} finally {
-					await ActualBudget.shutdownApiClient.call(this);
 				}
 			},
 			/**
@@ -1418,7 +1403,6 @@ export class ActualBudget implements INodeType {
 			async getSchedules(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const credentials = await this.getCredentials('actualBudgetApi');
 				const { syncId } = credentials as { syncId: string };
-				await ActualBudget.initApiClient.call(this);
 				if (syncId) {
 					await api.downloadBudget(syncId);
 				}
@@ -1432,8 +1416,6 @@ export class ActualBudget implements INodeType {
 					throw new NodeApiError(this.getNode(), {
 						message: `Error fetching schedules: ${(error as Error).message}`,
 					});
-				} finally {
-					await ActualBudget.shutdownApiClient.call(this);
 				}
 			},
 		},
@@ -1450,19 +1432,16 @@ export class ActualBudget implements INodeType {
 
 		const credentials = await this.getCredentials('actualBudgetApi');
 		const { syncId } = credentials as { syncId: string };
+		console.log(`syncId: ${syncId}`);
 
 		for (let i = 0; i < items.length; i++) {
 			const resource = this.getNodeParameter('resource', i) as string;
 			const operation = this.getNodeParameter('operation', i) as string;
 
-			await ActualBudget.initApiClient.call(this);
-			await api.downloadBudget(syncId);
-
-			try {
-				let result: any;
-
-				switch (resource) {
-					case 'account':
+			            try {
+			                let result: any;
+			
+			                switch (resource) {					case 'account':
 						switch (operation) {
 							case 'getAll':
 								result = await api.getAccounts();
@@ -1855,6 +1834,7 @@ export class ActualBudget implements INodeType {
 
 				returnData.push({ json: { data: result } });
 			} catch (error) {
+				console.error('Error executing operation:', error);
 				{
 					if (this.continueOnFail()) {
 						returnData.push({ json: { error: (error as Error).message } });
