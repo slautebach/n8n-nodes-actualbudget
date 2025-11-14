@@ -17,32 +17,32 @@ describe('ActualBudget Node', () => {
 		expect(node.description).toBeDefined();
 	});
 
-	describe('loadOptions', () => {
-		describe('Integration Tests', () => {
-			beforeEach(async () => {
-				try {
-					const dataDirPath = 'tests/dataDir';
-					if (fs.existsSync(dataDirPath)) {
-						fs.rmSync(dataDirPath, { recursive: true, force: true });
-					}
-					fs.mkdirSync(dataDirPath, { recursive: true });
-
-					await api.init({
-						serverURL: process.env.ACTUAL_SERVER_URL,
-						password: process.env.ACTUAL_SERVER_PASSWORD,
-						dataDir: dataDirPath,
-					});
-					await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
-				} catch (error) {
-					console.error('Failed to initialize Actual Budget API:', error);
-					throw error;
+	describe('Integration Tests', () => {
+		beforeEach(async () => {
+			try {
+				const dataDirPath = 'tests/dataDir';
+				if (fs.existsSync(dataDirPath)) {
+					fs.rmSync(dataDirPath, { recursive: true, force: true });
 				}
-			});
+				fs.mkdirSync(dataDirPath, { recursive: true });
 
-			afterEach(async () => {
-				await api.shutdown();
-			});
+				await api.init({
+					serverURL: process.env.ACTUAL_SERVER_URL,
+					password: process.env.ACTUAL_SERVER_PASSWORD,
+					dataDir: dataDirPath,
+				});
+				await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
+			} catch (error) {
+				console.error('Failed to initialize Actual Budget API:', error);
+				throw error;
+			}
+		});
 
+		afterEach(async () => {
+			await api.shutdown();
+		});
+
+		describe('Accounts', () => {
 			it('getAccounts should return accounts from a live server', async () => {
 				const loadOptionsFunctions = {
 					getCredentials: jest.fn().mockResolvedValue({
@@ -82,6 +82,7 @@ describe('ActualBudget Node', () => {
 				} finally {
 					// Clean up the test account
 					if (testAccountId) {
+						// Re-initialize the API to ensure the budget is loaded for cleanup
 						await api.init({
 							serverURL: process.env.ACTUAL_SERVER_URL,
 							password: process.env.ACTUAL_SERVER_PASSWORD,
@@ -93,7 +94,9 @@ describe('ActualBudget Node', () => {
 					}
 				}
 			});
+		});
 
+		describe('Categories', () => {
 			it('getCategories should return categories from a live server', async () => {
 				const loadOptionsFunctions = {
 					getCredentials: jest.fn().mockResolvedValue({
@@ -195,7 +198,9 @@ describe('ActualBudget Node', () => {
 					}
 				}
 			});
+		});
 
+		describe('Payees', () => {
 			it('getPayees should return payees from a live server', async () => {
 				const loadOptionsFunctions = {
 					getCredentials: jest.fn().mockResolvedValue({
@@ -242,7 +247,9 @@ describe('ActualBudget Node', () => {
 					}
 				}
 			});
+		});
 
+		describe('Rules', () => {
 			it('getRules should return rules from a live server', async () => {
 				const loadOptionsFunctions = {
 					getCredentials: jest.fn().mockResolvedValue({
@@ -318,7 +325,9 @@ describe('ActualBudget Node', () => {
 					await api.shutdown();
 				}
 			});
+		});
 
+		describe('Schedules', () => {
 			it('getSchedules should return schedules from a live server', async () => {
 				const loadOptionsFunctions = {
 					getCredentials: jest.fn().mockResolvedValue({
@@ -390,32 +399,8 @@ describe('ActualBudget Node', () => {
 				}
 			});
 		});
-	});
-	describe('execute', () => {
-		describe('Integration Tests', () => {
-			beforeEach(async () => {
-				try {
-					const dataDirPath = 'tests/dataDir';
-					if (fs.existsSync(dataDirPath)) {
-						fs.rmSync(dataDirPath, { recursive: true, force: true });
-					}
-					fs.mkdirSync(dataDirPath, { recursive: true });
-					await api.init({
-						serverURL: process.env.ACTUAL_SERVER_URL,
-						password: process.env.ACTUAL_SERVER_PASSWORD,
-						dataDir: dataDirPath,
-					});
-					await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
-				} catch (error) {
-					console.error('Failed to initialize Actual Budget API:', error);
-					throw error;
-				}
-			});
 
-			afterEach(async () => {
-				await api.shutdown();
-			});
-
+		describe('Transactions', () => {
 			it('getTransactions should return transactions from a live server', async () => {
 				const node = new ActualBudget();
 				let testAccountId: string | null = null;
