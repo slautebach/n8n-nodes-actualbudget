@@ -22,6 +22,7 @@ describe('ActualBudget Node', () => {
 				try {
 					console.log('ACTUAL_BUDGET_ID:', process.env.ACTUAL_BUDGET_ID);
 					console.log('ACTUAL_SERVER_URL:', process.env.ACTUAL_SERVER_URL);
+
 					await api.init({
 						serverURL: process.env.ACTUAL_SERVER_URL,
 						password: process.env.ACTUAL_SERVER_PASSWORD,
@@ -48,16 +49,24 @@ describe('ActualBudget Node', () => {
 				} as unknown as ILoadOptionsFunctions;
 
 				const node = new ActualBudget();
+				let testAccountId: string | null = null;
+				const accountName = `Test Account ${Date.now()}`;
+
 				try {
+					// Create a test account to ensure we have one to test against
+					testAccountId = await api.createAccount({ name: accountName, type: 'checking' });
+					await api.downloadBudget(process.env.ACTUAL_BUDGET_ID as string);
+
 					const result = await node.methods.loadOptions.getAccounts.call(loadOptionsFunctions);
 
 					// We expect the result to be an array, and we can't know the exact content
 					expect(Array.isArray(result)).toBe(true);
-					// Optional: Check if the array is not empty, assuming the test server has accounts
-					if (result.length > 0) {
-						expect(result[0]).toHaveProperty('name');
-						expect(result[0]).toHaveProperty('value');
-					}
+
+					// Find the created account in the results
+					const testAccount = result.find((account) => account.name === accountName);
+					expect(testAccount).toBeDefined();
+					expect(testAccount?.value).toBe(testAccountId);
+
 				} catch (error) {
 					if (error instanceof NodeApiError) {
 						const errorMessage = (error.cause as Error)?.message || error.message;
@@ -66,6 +75,19 @@ describe('ActualBudget Node', () => {
 						console.error('Caught unexpected error:', error);
 					}
 					throw error;
+				} finally {
+					// Clean up the test account
+					if (testAccountId) {
+						// Re-initialize the API to ensure the budget is loaded for cleanup
+						await api.init({
+							serverURL: process.env.ACTUAL_SERVER_URL,
+							password: process.env.ACTUAL_SERVER_PASSWORD,
+							dataDir: 'tests/dataDir',
+						});
+						await api.downloadBudget(process.env.ACTUAL_BUDGET_ID as string);
+						await api.deleteAccount(testAccountId);
+						await api.shutdown();
+					}
 				}
 			});
 		});
