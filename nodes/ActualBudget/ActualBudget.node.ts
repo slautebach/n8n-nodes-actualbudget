@@ -1654,7 +1654,7 @@ export class ActualBudget implements INodeType {
 							case 'merge':
 								const payeeIdForMerge = this.getNodeParameter('payeeId', i) as string;
 								const targetPayeeIdForMerge = this.getNodeParameter('targetPayeeId', i) as string;
-								await api.mergePayees([payeeIdForMerge], targetPayeeIdForMerge);
+								await api.mergePayees(payeeIdForMerge, targetPayeeIdForMerge);
 								result = { success: true };
 								break;
 							case 'update':
