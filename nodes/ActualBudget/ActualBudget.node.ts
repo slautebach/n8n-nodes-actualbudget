@@ -126,29 +126,6 @@ export class ActualBudget implements INodeType {
 				noDataExpression: true,
 			},
 			{
-				displayName: 'Sync ID',
-				description: 'The Sync ID of the Budget you are working on/with',
-				name: 'syncId',
-				type: 'string',
-				default: '',
-				required: true,
-				displayOptions: {
-					show: {
-						resource: [
-							'account',
-							'budget',
-							'category',
-							'categoryGroup',
-							'payee',
-							'rule',
-							'schedule',
-							'transaction',
-							'utility',
-						],
-					},
-				},
-			},
-			{
 				displayName: 'Operation',
 				name: 'operation',
 				type: 'options',
@@ -1235,7 +1212,12 @@ export class ActualBudget implements INodeType {
 	methods = {
 		loadOptions: {
 			async getAccounts(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const credentials = await this.getCredentials('actualBudgetApi');
+				const { syncId } = credentials as { syncId: string };
 				await ActualBudget.initApiClient.call(this);
+				if (syncId) {
+					await api.downloadBudget(syncId);
+				}
 				try {
 					const accounts = await api.getAccounts();
 					return accounts.map((account) => ({
@@ -1251,7 +1233,12 @@ export class ActualBudget implements INodeType {
 				}
 			},
 			async getCategories(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const credentials = await this.getCredentials('actualBudgetApi');
+				const { syncId } = credentials as { syncId: string };
 				await ActualBudget.initApiClient.call(this);
+				if (syncId) {
+					await api.downloadBudget(syncId);
+				}
 				try {
 					const categories = await api.getCategories();
 					return categories.map((category) => ({
@@ -1267,7 +1254,12 @@ export class ActualBudget implements INodeType {
 				}
 			},
 			async getCategoryGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const credentials = await this.getCredentials('actualBudgetApi');
+				const { syncId } = credentials as { syncId: string };
 				await ActualBudget.initApiClient.call(this);
+				if (syncId) {
+					await api.downloadBudget(syncId);
+				}
 				try {
 					const categoryGroups = await api.getCategoryGroups();
 					return categoryGroups.map((categoryGroup) => ({
@@ -1283,7 +1275,12 @@ export class ActualBudget implements INodeType {
 				}
 			},
 			async getPayees(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const credentials = await this.getCredentials('actualBudgetApi');
+				const { syncId } = credentials as { syncId: string };
 				await ActualBudget.initApiClient.call(this);
+				if (syncId) {
+					await api.downloadBudget(syncId);
+				}
 				try {
 					const payees = await api.getPayees();
 					return payees.map((payee) => ({
@@ -1299,7 +1296,12 @@ export class ActualBudget implements INodeType {
 				}
 			},
 			async getRules(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const credentials = await this.getCredentials('actualBudgetApi');
+				const { syncId } = credentials as { syncId: string };
 				await ActualBudget.initApiClient.call(this);
+				if (syncId) {
+					await api.downloadBudget(syncId);
+				}
 				try {
 					const rules = await api.getRules();
 					return rules.map((rule) => ({
@@ -1315,7 +1317,12 @@ export class ActualBudget implements INodeType {
 				}
 			},
 			async getSchedules(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const credentials = await this.getCredentials('actualBudgetApi');
+				const { syncId } = credentials as { syncId: string };
 				await ActualBudget.initApiClient.call(this);
+				if (syncId) {
+					await api.downloadBudget(syncId);
+				}
 				try {
 					const schedules = await api.getSchedules();
 					return schedules.map((schedule) => ({
@@ -1337,10 +1344,12 @@ export class ActualBudget implements INodeType {
 		const items = this.getInputData();
 		const returnData = [];
 
+		const credentials = await this.getCredentials('actualBudgetApi');
+		const { syncId } = credentials as { syncId: string };
+
 		for (let i = 0; i < items.length; i++) {
 			const resource = this.getNodeParameter('resource', i) as string;
 			const operation = this.getNodeParameter('operation', i) as string;
-			const syncId = this.getNodeParameter('syncId', i) as string;
 
 			await ActualBudget.initApiClient.call(this);
 			await api.downloadBudget(syncId);

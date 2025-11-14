@@ -48,6 +48,7 @@ describe('ActualBudget Node', () => {
 					getCredentials: jest.fn().mockResolvedValue({
 						serverURL: process.env.ACTUAL_SERVER_URL,
 						password: process.env.ACTUAL_SERVER_PASSWORD,
+						syncId: process.env.ACTUAL_SYNC_ID,
 					}),
 					getNode: jest.fn(),
 				} as unknown as ILoadOptionsFunctions;
@@ -98,6 +99,7 @@ describe('ActualBudget Node', () => {
 					getCredentials: jest.fn().mockResolvedValue({
 						serverURL: process.env.ACTUAL_SERVER_URL,
 						password: process.env.ACTUAL_SERVER_PASSWORD,
+						syncId: process.env.ACTUAL_SYNC_ID,
 					}),
 					getNode: jest.fn(),
 				} as unknown as ILoadOptionsFunctions;
@@ -152,6 +154,7 @@ describe('ActualBudget Node', () => {
 					getCredentials: jest.fn().mockResolvedValue({
 						serverURL: process.env.ACTUAL_SERVER_URL,
 						password: process.env.ACTUAL_SERVER_PASSWORD,
+						syncId: process.env.ACTUAL_SYNC_ID,
 					}),
 					getNode: jest.fn(),
 				} as unknown as ILoadOptionsFunctions;
@@ -198,6 +201,7 @@ describe('ActualBudget Node', () => {
 					getCredentials: jest.fn().mockResolvedValue({
 						serverURL: process.env.ACTUAL_SERVER_URL,
 						password: process.env.ACTUAL_SERVER_PASSWORD,
+						syncId: process.env.ACTUAL_SYNC_ID,
 					}),
 					getNode: jest.fn(),
 				} as unknown as ILoadOptionsFunctions;
@@ -244,6 +248,7 @@ describe('ActualBudget Node', () => {
 					getCredentials: jest.fn().mockResolvedValue({
 						serverURL: process.env.ACTUAL_SERVER_URL,
 						password: process.env.ACTUAL_SERVER_PASSWORD,
+						syncId: process.env.ACTUAL_SYNC_ID,
 					}),
 					getNode: jest.fn(),
 				} as unknown as ILoadOptionsFunctions;
@@ -319,6 +324,7 @@ describe('ActualBudget Node', () => {
 					getCredentials: jest.fn().mockResolvedValue({
 						serverURL: process.env.ACTUAL_SERVER_URL,
 						password: process.env.ACTUAL_SERVER_PASSWORD,
+						syncId: process.env.ACTUAL_SYNC_ID,
 					}),
 					getNode: jest.fn(),
 				} as unknown as ILoadOptionsFunctions;
@@ -432,6 +438,7 @@ describe('ActualBudget Node', () => {
 						getCredentials: jest.fn().mockResolvedValue({
 							serverURL: process.env.ACTUAL_SERVER_URL,
 							password: process.env.ACTUAL_SERVER_PASSWORD,
+							syncId: process.env.ACTUAL_SYNC_ID,
 						}),
 						getNode: jest.fn(),
 						getNodeParameter: jest.fn((name: string) => {
@@ -440,7 +447,6 @@ describe('ActualBudget Node', () => {
 							if (name === 'accountId') return testAccountId;
 							if (name === 'startDate') return '2023-01-01';
 							if (name === 'endDate') return '2023-12-31';
-							if (name === 'syncId') return process.env.ACTUAL_SYNC_ID;
 							return null;
 						}),
 						getInputData: jest.fn().mockReturnValue([

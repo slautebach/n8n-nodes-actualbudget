@@ -22,6 +22,14 @@ export class ActualBudgetApi implements ICredentialType {
 			default: '',
 			required: true,
 		},
+		{
+			displayName: 'Sync ID',
+			name: 'syncId',
+			type: 'string',
+			default: '',
+			required: true,
+			description: 'The Sync ID of the Budget you want to work on',
+		},
 	];
 
 	test: ICredentialTestRequest = {
