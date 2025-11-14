@@ -10,3 +10,5 @@ yarn.lock
 .idea
 .tool-versions
 /.vs
+/.env
+/tests/dataDir/My-Finances-dc74fe3
