@@ -861,6 +861,14 @@ describe('ActualBudget Node', () => {
 					const targetPayeeName = `Target Payee ${Date.now()}`;
 
 					try {
+				it('merge payees', async () => {
+					const node = new ActualBudget();
+					let sourcePayeeId: string | null = null;
+					let targetPayeeId: string | null = null;
+					const sourcePayeeName = `Source Payee ${Date.now()}`;
+					const targetPayeeName = `Target Payee ${Date.now()}`;
+
+					try {
 						sourcePayeeId = await api.createPayee({ name: sourcePayeeName });
 						targetPayeeId = await api.createPayee({ name: targetPayeeName });
 
