@@ -1,10 +1,11 @@
 # n8n-nodes-actualbudget
 
-This project is a fork of [TheFehr/n8n-nodes-actual](https://github.com/TheFehr/n8n-nodes-actual). This fork is being developed with AI assistance to add complete features for the Actual Budget API, including comprehensive operations for accounts, budgets, categories, payees, rules, schedules, and transactions, as well as utility functions for synchronization and data management.
+This project is a fork of [TheFehr/n8n-nodes-actual](https://github.com/TheFehr/n8n-nodes-actual). 
+The project goals are to develop and add complete features for the Actual Budget API, including comprehensive operations for accounts, budgets, categories, payees, rules, schedules, and transactions, as well as utility functions for synchronization and data management.
 
 This is a n8n community node for Actual Budget. It lets you use Actual in your n8n workflows.
 
-Actual is a local-first personal finance tool. It is 100% free and open-source, written in NodeJS, it has a synchronization element so that all your changes can move between devices without any heavy lifting.
+[Actual Budget](https://actualbudget.org/) is a local-first personal finance tool. It is 100% free and open-source, written in NodeJS, it has a synchronization element so that all your changes can move between devices without any heavy lifting.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
