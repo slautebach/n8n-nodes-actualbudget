@@ -21,18 +21,13 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ## Usage
 
-To use this node in your n8n workflows, drag and drop the "Actual Budget" node onto your canvas. Configure your Actual Budget API credentials (Server URL and Password) as described in the [Credentials](#credentials) section. Then, select the desired "Resource" (e.g., Account, Transaction, Category) and "Operation" (e.g., Get Many, Create, Update) from the node's parameters. Provide any additional parameters required for the chosen operation, such as account IDs, transaction details, or category names.
+To use this node in your n8n workflows, you first need to configure your Actual Budget API credentials. This includes providing the **Server URL**, **Password**, and **Sync ID** for the budget you wish to access.
 
-### Example: Get All Transactions for an Account
+Once your credentials are set up, you can use the Actual Budget node in your workflows. The node is organized by **Resource**, such as `Account`, `Transaction`, or `Category`, and each resource has a set of **Operations** you can perform, like `Get Many`, `Create`, or `Update`.
 
-1.  Add the **Actual Budget** node to your workflow.
-2.  Select your credentials in the **Credentials** parameter.
-3.  Set the **Resource** to `Transaction`.
-4.  Set the **Operation** to `Get Many`.
-5.  Choose the desired account from the **Account Name or ID** dropdown list.
-6.  Execute the node. The output will be a JSON object containing all transactions for the selected account.
+To get started, drag the **Actual Budget** node onto your canvas, select your credentials, and then choose the desired **Resource** and **Operation**. Depending on the operation, you may need to provide additional parameters, such as an account ID for fetching transactions or the details for creating a new category.
 
-For detailed information on building workflows with n8n, refer to the [n8n documentation](https://docs.n8n.io/).
+For more detailed information on building workflows with n8n, refer to the [n8n documentation](https://docs.n8n.io/).
 
 ## Operations
 This node provides comprehensive operations across various Actual Budget resources:
@@ -108,7 +103,7 @@ To connect to your Actual Budget instance, you will need to provide the **Server
 
 *   **Server URL**: This is the URL where your Actual Budget instance is hosted (e.g., `http://localhost:5006` or your custom domain).
 *   **Password**: This is the password you use to access your Actual Budget instance.
-*   **Sync ID**: The Sync ID of the Budget you want to work on.
+*   **Sync ID**: The Sync ID of the Budget you want to work on. You can find this in the URL of your budget file in Actual Budget.
 
 E2E budgets are currently **not** supported.
 
