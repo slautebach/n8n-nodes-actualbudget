@@ -378,6 +378,63 @@ describe('ActualBudget Node', () => {
 					}
 				});
 
+				it('get all category groups', async () => {
+					const node = new ActualBudget();
+					let testGroupId: string | null = null;
+					const groupName = `Test Group ${Date.now()}`;
+
+					try {
+						testGroupId = await api.createCategoryGroup({ name: groupName });
+
+						const executeFunctions = {
+							getCredentials: jest.fn().mockResolvedValue({
+								serverURL: process.env.ACTUAL_SERVER_URL,
+								password: process.env.ACTUAL_SERVER_PASSWORD,
+								syncId: process.env.ACTUAL_SYNC_ID,
+							}),
+							getNode: jest.fn(),
+							getNodeParameter: jest.fn((name: string) => {
+								if (name === 'resource') return 'categoryGroup';
+								if (name === 'operation') return 'getAll';
+								return null;
+							}),
+							getInputData: jest.fn().mockReturnValue([
+								{},
+							]),
+							helpers: {
+								returnJsonArray: jest.fn((data) => data),
+							},
+							continueOnFail: jest.fn().mockReturnValue(false),
+						} as unknown as IExecuteFunctions;
+
+						const result = await node.execute.call(executeFunctions);
+						expect(Array.isArray(result[0][0].json.data)).toBe(true);
+						const categoryGroups = result[0][0].json.data;
+						const foundGroup = categoryGroups.find((group: any) => group.id === testGroupId && group.name === groupName);
+						expect(foundGroup).toBeDefined();
+
+					} catch (error: any) {
+						if (error instanceof NodeApiError) {
+							const errorMessage = (error.cause as Error)?.message || error.message;
+							console.error('Caught NodeApiError:', errorMessage);
+						} else {
+							console.error('Caught unexpected error:', error);
+						}
+						throw error;
+					} finally {
+						await api.init({
+							serverURL: process.env.ACTUAL_SERVER_URL,
+							password: process.env.ACTUAL_SERVER_PASSWORD,
+							dataDir: 'tests/dataDir',
+						});
+						await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
+						if (testGroupId) {
+							await api.deleteCategoryGroup(testGroupId);
+						}
+						await api.shutdown();
+					}
+				});
+
 				it('delete a category group', async () => {
 					const node = new ActualBudget();
 					let testGroupId: string | null = null;
