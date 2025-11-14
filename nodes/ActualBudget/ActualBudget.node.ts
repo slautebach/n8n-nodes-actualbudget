@@ -1688,6 +1688,7 @@ export class ActualBudget implements INodeType {
 						}
 						break;
 					case 'rule':
+						console.log({ resource, operation });
 						switch (operation) {
 							case 'getAll':
 								result = await api.getRules();
