@@ -1,4 +1,3 @@
-
 ## Unimplemented API Features
 
 Based on a review of the `@actual-app/api` documentation and the existing codebase, the following features are not yet implemented in this n8n node:
@@ -45,38 +44,38 @@ Based on a review of the `@actual-app/api` documentation and the existing codeba
 Here is a task list for implementing the missing features:
 
 ### Account Operations
-- [x] Implement `closeAccount` operation.
-- [x] Implement `createAccount` operation.
-- [x] Implement `deleteAccount` operation.
-- [x] Implement `getAccount` operation.
-- [x] Implement `reopenAccount` operation.
-- [x] Implement `updateAccount` operation.
+- [ ] Implement `closeAccount` operation.
+- [ ] Implement `createAccount` operation.
+- [ ] Implement `deleteAccount` operation.
+- [ ] Implement `getAccount` operation.
+- [ ] Implement `reopenAccount` operation.
+- [ ] Implement `updateAccount` operation.
 
 ### Payee Operations
-- [x] Implement `createPayee` operation.
-- [x] Implement `deletePayee` operation.
-- [x] Implement `getPayee` operation.
-- [x] Implement `updatePayee` operation.
+- [ ] Implement `createPayee` operation.
+- [ ] Implement `deletePayee` operation.
+- [ ] Implement `getPayee` operation.
+- [ ] Implement `updatePayee` operation.
 
 ### Rule Operations
-- [x] Implement `createRule` operation.
-- [x] Implement `deleteRule` operation.
-- [x] Implement `getRule` operation.
-- [x] Implement `updateRule` operation.
+- [ ] Implement `createRule` operation.
+- [ ] Implement `deleteRule` operation.
+- [ ] Implement `getRule` operation.
+- [ ] Implement `updateRule` operation.
 
 ### Schedule Operations
-- [x] Implement `createSchedule` operation.
-- [x] Implement `deleteSchedule` operation.
-- [x] Implement `getSchedule` operation.
-- [x] Implement `updateSchedule` operation.
+- [ ] Implement `createSchedule` operation.
+- [ ] Implement `deleteSchedule` operation.
+- [ ] Implement `getSchedule` operation.
+- [ ] Implement `updateSchedule` operation.
 
 ### Transaction Operations
-- [x] Implement `deleteTransaction` operation.
-- [x] Implement `getTransaction` operation.
+- [ ] Implement `deleteTransaction` operation.
+- [ ] Implement `getTransaction` operation.
 
 ### Utility Operations
-- [x] Implement `runQuery` operation.
-- [x] Implement `sync` operation.
-- [x] Implement `runBankSync` operation.
-- [x] Implement `amountToInteger` utility function.
-- [x] Implement `integerToAmount` utility function.
+- [ ] Implement `runQuery` operation.
+- [ ] Implement `sync` operation.
+- [ ] Implement `runBankSync` operation.
+- [ ] Implement `amountToInteger` utility function.
+- [ ] Implement `integerToAmount` utility function.
