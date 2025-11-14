@@ -14,7 +14,14 @@ import {
 
 import * as api from '@actual-app/api';
 
+/**
+ * Represents the Actual Budget node for n8n, allowing interaction with an Actual Budget instance.
+ */
 export class ActualBudget implements INodeType {
+	/**
+	 * Initializes the Actual Budget API client.
+	 * @param this - The context of the function, can be IExecuteFunctions, ILoadOptionsFunctions, or IHookFunctions.
+	 */
 	static async initApiClient(this: IExecuteFunctions | ILoadOptionsFunctions | IHookFunctions) {
 		const credentials = await this.getCredentials('actualBudgetApi');
 		if (credentials === undefined) {
@@ -49,6 +56,10 @@ export class ActualBudget implements INodeType {
 		}
 	}
 
+	/**
+	 * Shuts down the Actual Budget API client.
+	 * @param this - The context of the function, can be IExecuteFunctions, ILoadOptionsFunctions, or IHookFunctions.
+	 */
 	static async shutdownApiClient(this: IExecuteFunctions | ILoadOptionsFunctions | IHookFunctions) {
 		try {
 			await api.shutdown();
@@ -58,6 +69,9 @@ export class ActualBudget implements INodeType {
 		}
 	}
 
+	/**
+	 * The description of the node, including its display name, properties, and other metadata.
+	 */
 	description: INodeTypeDescription = {
 		displayName: 'Actual Budget',
 		name: 'actualBudget',
@@ -1209,8 +1223,16 @@ export class ActualBudget implements INodeType {
 		],
 	};
 
+	/**
+	 * Methods for loading options for node properties.
+	 */
 	methods = {
 		loadOptions: {
+			/**
+			 * Gets a list of accounts from Actual Budget.
+			 * @param this - The context of the function, ILoadOptionsFunctions.
+			 * @returns A list of accounts as INodePropertyOptions[].
+			 */
 			async getAccounts(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const credentials = await this.getCredentials('actualBudgetApi');
 				const { syncId } = credentials as { syncId: string };
@@ -1232,6 +1254,11 @@ export class ActualBudget implements INodeType {
 					await ActualBudget.shutdownApiClient.call(this);
 				}
 			},
+			/**
+			 * Gets a list of categories from Actual Budget.
+			 * @param this - The context of the function, ILoadOptionsFunctions.
+			 * @returns A list of categories as INodePropertyOptions[].
+			 */
 			async getCategories(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const credentials = await this.getCredentials('actualBudgetApi');
 				const { syncId } = credentials as { syncId: string };
@@ -1253,6 +1280,11 @@ export class ActualBudget implements INodeType {
 					await ActualBudget.shutdownApiClient.call(this);
 				}
 			},
+			/**
+			 * Gets a list of category groups from Actual Budget.
+			 * @param this - The context of the function, ILoadOptionsFunctions.
+			 * @returns A list of category groups as INodePropertyOptions[].
+			 */
 			async getCategoryGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const credentials = await this.getCredentials('actualBudgetApi');
 				const { syncId } = credentials as { syncId: string };
@@ -1274,6 +1306,11 @@ export class ActualBudget implements INodeType {
 					await ActualBudget.shutdownApiClient.call(this);
 				}
 			},
+			/**
+			 * Gets a list of payees from Actual Budget.
+			 * @param this - The context of the function, ILoadOptionsFunctions.
+			 * @returns A list of payees as INodePropertyOptions[].
+			 */
 			async getPayees(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const credentials = await this.getCredentials('actualBudgetApi');
 				const { syncId } = credentials as { syncId: string };
@@ -1295,6 +1332,11 @@ export class ActualBudget implements INodeType {
 					await ActualBudget.shutdownApiClient.call(this);
 				}
 			},
+			/**
+			 * Gets a list of rules from Actual Budget.
+			 * @param this - The context of the function, ILoadOptionsFunctions.
+			 * @returns A list of rules as INodePropertyOptions[].
+			 */
 			async getRules(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const credentials = await this.getCredentials('actualBudgetApi');
 				const { syncId } = credentials as { syncId: string };
@@ -1316,6 +1358,11 @@ export class ActualBudget implements INodeType {
 					await ActualBudget.shutdownApiClient.call(this);
 				}
 			},
+			/**
+			 * Gets a list of schedules from Actual Budget.
+			 * @param this - The context of the function, ILoadOptionsFunctions.
+			 * @returns A list of schedules as INodePropertyOptions[].
+			 */
 			async getSchedules(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const credentials = await this.getCredentials('actualBudgetApi');
 				const { syncId } = credentials as { syncId: string };
@@ -1340,6 +1387,11 @@ export class ActualBudget implements INodeType {
 		},
 	};
 
+	/**
+	 * Executes the node's operation.
+	 * @param this - The context of the function, IExecuteFunctions.
+	 * @returns The result of the operation.
+	 */
 	async execute(this: IExecuteFunctions): Promise<any> {
 		const items = this.getInputData();
 		const returnData = [];

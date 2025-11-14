@@ -1,9 +1,15 @@
 import { ICredentialTestRequest, ICredentialType, INodeProperties } from 'n8n-workflow';
 
+/**
+ * Represents the credentials for the Actual Budget API.
+ */
 export class ActualBudgetApi implements ICredentialType {
 	name = 'actualBudgetApi';
 	displayName = 'Actual Budget API';
 	documentationUrl = 'https://actualbudget.org/docs/api/';
+	/**
+	 * The properties of the credentials.
+	 */
 	properties: INodeProperties[] = [
 		{
 			displayName: 'Server URL',
@@ -32,6 +38,9 @@ export class ActualBudgetApi implements ICredentialType {
 		},
 	];
 
+	/**
+	 * The test request to verify the credentials.
+	 */
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: '={{$credentials?.serverURL}}',

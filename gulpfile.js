@@ -1,6 +1,10 @@
 const path = require('path');
 const { task, src, dest } = require('gulp');
 
+/**
+ * This gulpfile is used to copy the icons from the nodes and credentials folders to the dist folder.
+ */
+
 task('build:icons', copyIcons);
 
 function copyIcons() {
