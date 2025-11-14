@@ -1704,7 +1704,7 @@ export class ActualBudget implements INodeType {
 						break;
 					case 'payee':
 						switch (operation) {
-							case 'create':
+							case 'create': {
 								const name = this.getNodeParameter('name', i) as string;
 								const transferAccountId = this.getNodeParameter('transferAccountId', i) as string;
 								const payee = {
@@ -1713,16 +1713,20 @@ export class ActualBudget implements INodeType {
 								};
 								result = await api.createPayee(payee);
 								break;
-							case 'delete':
+							}
+							case 'delete': {
 								const payeeIdForDelete = this.getNodeParameter('payeeId', i) as string;
 								await api.deletePayee(payeeIdForDelete);
 								result = { success: true };
 								break;
-							case 'get':
+							}
+							case 'get': {
 								const payeeIdToGet = this.getNodeParameter('payeeId', i) as string;
-								result = await api.getPayee(payeeIdToGet);
+								const payees = await api.getPayees();
+								result = payees.find((p: any) => p.id === payeeIdToGet);
 								break;
-							case 'update':
+							}
+							case 'update': {
 								const payeeIdToUpdate = this.getNodeParameter('payeeId', i) as string;
 								const name = this.getNodeParameter('name', i) as string;
 								const transferAccountId = this.getNodeParameter('transferAccountId', i) as string;
@@ -1733,11 +1737,12 @@ export class ActualBudget implements INodeType {
 								await api.updatePayee(payeeIdToUpdate, payee);
 								result = { success: true };
 								break;
+							}
 						}
 						break;
 					case 'rule':
 						switch (operation) {
-							case 'create':
+							case 'create': {
 								const stage = this.getNodeParameter('stage', i) as string;
 								const conditions = this.getNodeParameter('conditions', i) as any[];
 								const actions = this.getNodeParameter('actions', i) as any[];
@@ -1750,16 +1755,20 @@ export class ActualBudget implements INodeType {
 								};
 								result = await api.createRule(rule);
 								break;
-							case 'delete':
+							}
+							case 'delete': {
 								const ruleIdToDelete = this.getNodeParameter('ruleId', i) as string;
 								await api.deleteRule(ruleIdToDelete);
 								result = { success: true };
 								break;
-							case 'get':
+							}
+							case 'get': {
 								const ruleIdToGet = this.getNodeParameter('ruleId', i) as string;
-								result = await api.getRule(ruleIdToGet);
+								const rules = await api.getRules();
+								result = rules.find((r: any) => r.id === ruleIdToGet);
 								break;
-							case 'update':
+							}
+							case 'update': {
 								const ruleIdToUpdate = this.getNodeParameter('ruleId', i) as string;
 								const stage = this.getNodeParameter('stage', i) as string;
 								const conditions = this.getNodeParameter('conditions', i) as any[];
@@ -1775,27 +1784,37 @@ export class ActualBudget implements INodeType {
 								await api.updateRule(rule);
 								result = { success: true };
 								break;
+							}
 						}
 						break;
 					case 'schedule':
 						switch (operation) {
-							case 'create':
+							case 'create': {
 								const scheduleDetails = this.getNodeParameter('scheduleDetails', i) as object;
 								result = await api.createSchedule(scheduleDetails);
 								break;
-							case 'delete':
+							}
+							case 'delete': {
 								const scheduleIdToDelete = this.getNodeParameter('scheduleId', i) as string;
 								await api.deleteSchedule(scheduleIdToDelete);
 								result = { success: true };
 								break;
-							                                break;
-							                            case 'update':
-							                                const scheduleIdToUpdate = this.getNodeParameter('scheduleId', i) as string;
-							                                const scheduleDetails = this.getNodeParameter('scheduleDetails', i) as object;
-							                                await api.updateSchedule(scheduleIdToUpdate, scheduleDetails);
-							                                result = { success: true };
-							                                break;
-							                        }						break;
+							}
+							case 'get': {
+								const scheduleIdToGet = this.getNodeParameter('scheduleId', i) as string;
+								const schedules = await api.getSchedules();
+								result = schedules.find((s: any) => s.id === scheduleIdToGet);
+								break;
+							}
+							case 'update': {
+								const scheduleIdToUpdate = this.getNodeParameter('scheduleId', i) as string;
+								const scheduleDetails = this.getNodeParameter('scheduleDetails', i) as object;
+								await api.updateSchedule(scheduleIdToUpdate, scheduleDetails);
+								result = { success: true };
+								break;
+							}
+						}
+						break;
 					case 'utility':
 						switch (operation) {
 							case 'runQuery':
