@@ -247,6 +247,69 @@ describe('ActualBudget Node', () => {
 			});
 
 			describe('execute', () => {
+				it('get all categories', async () => {
+					const node = new ActualBudget();
+					let testGroupId: string | null = null;
+					let testCategoryId: string | null = null;
+					const categoryName = `Test Category ${Date.now()}`;
+					const groupName = `Test Group ${Date.now()}`;
+
+					try {
+						testGroupId = await api.createCategoryGroup({ name: groupName });
+						testCategoryId = await api.createCategory({ name: categoryName, group_id: testGroupId as string });
+
+						const executeFunctions = {
+							getCredentials: jest.fn().mockResolvedValue({
+								serverURL: process.env.ACTUAL_SERVER_URL,
+								password: process.env.ACTUAL_SERVER_PASSWORD,
+								syncId: process.env.ACTUAL_SYNC_ID,
+							}),
+							getNode: jest.fn(),
+							getNodeParameter: jest.fn((name: string) => {
+								if (name === 'resource') return 'category';
+								if (name === 'operation') return 'getAll';
+								return null;
+							}),
+							getInputData: jest.fn().mockReturnValue([
+								{},
+							]),
+							helpers: {
+								returnJsonArray: jest.fn((data) => data),
+							},
+							continueOnFail: jest.fn().mockReturnValue(false),
+						} as unknown as IExecuteFunctions;
+
+						const result = await node.execute.call(executeFunctions);
+						expect(Array.isArray(result[0][0].json.data)).toBe(true);
+						const categories = result[0][0].json.data;
+						const foundCategory = categories.find((cat: any) => cat.id === testCategoryId && cat.name === categoryName);
+						expect(foundCategory).toBeDefined();
+
+					} catch (error: any) {
+						if (error instanceof NodeApiError) {
+							const errorMessage = (error.cause as Error)?.message || error.message;
+							console.error('Caught NodeApiError:', errorMessage);
+						} else {
+							console.error('Caught unexpected error:', error);
+						}
+						throw error;
+					} finally {
+						await api.init({
+							serverURL: process.env.ACTUAL_SERVER_URL,
+							password: process.env.ACTUAL_SERVER_PASSWORD,
+							dataDir: 'tests/dataDir',
+						});
+						await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
+						if (testCategoryId) {
+							await api.deleteCategory(testCategoryId);
+						}
+						if (testGroupId) {
+							await api.deleteCategoryGroup(testGroupId);
+						}
+						await api.shutdown();
+					}
+				});
+
 				it('delete a category', async () => {
 					const node = new ActualBudget();
 					let testGroupId: string | null = null;

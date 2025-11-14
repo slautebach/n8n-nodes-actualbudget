@@ -1587,6 +1587,9 @@ export class ActualBudget implements INodeType {
 						break;
 					case 'category':
 						switch (operation) {
+							case 'getAll':
+								result = await api.getCategories();
+								break;
 							case 'delete':
 								const categoryIdForDelete = this.getNodeParameter('categoryId', i) as string;
 								await api.deleteCategory(categoryIdForDelete);

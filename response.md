@@ -1,3 +1,0 @@
-The issue "No budget file is open" should now be resolved. I have modified the `execute` method in `nodes/ActualBudget/ActualBudget.node.ts` to ensure that the budget file specified by the `syncId` in your credentials is downloaded and opened before any operations are performed. I also added a `finally` block to ensure the API client is properly shut down after each execution.
-
-Please try running your n8n operation again.
