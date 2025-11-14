@@ -178,6 +178,11 @@ export class ActualBudget implements INodeType {
 						action: 'Get many accounts',
 					},
 					{
+						name: 'Get',
+						value: 'get',
+						action: 'Get an account',
+					},
+					{
 						name: 'Reopen',
 						value: 'reopen',
 						action: 'Reopen an account',
@@ -203,7 +208,7 @@ export class ActualBudget implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['account'],
-						operation: ['getBalance', 'update', 'close', 'reopen', 'delete'],
+						operation: ['getBalance', 'update', 'close', 'reopen', 'delete', 'get'],
 					},
 				},
 			},
@@ -614,6 +619,11 @@ export class ActualBudget implements INodeType {
 						action: 'Get many payees',
 					},
 					{
+						name: 'Get',
+						value: 'get',
+						action: 'Get a payee',
+					},
+					{
 						name: 'Get Rules',
 						value: 'getRules',
 						action: 'Get payee rules',
@@ -644,7 +654,7 @@ export class ActualBudget implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['payee'],
-						operation: ['update', 'delete', 'merge', 'getRules'],
+						operation: ['update', 'delete', 'merge', 'getRules', 'get'],
 					},
 				},
 			},
@@ -713,6 +723,11 @@ export class ActualBudget implements INodeType {
 						action: 'Get many rules',
 					},
 					{
+						name: 'Get',
+						value: 'get',
+						action: 'Get a rule',
+					},
+					{
 						name: 'Create',
 						value: 'create',
 						action: 'Create a rule',
@@ -743,7 +758,7 @@ export class ActualBudget implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['rule'],
-						operation: ['update', 'delete'],
+						operation: ['update', 'delete', 'get'],
 					},
 				},
 			},
@@ -837,6 +852,11 @@ export class ActualBudget implements INodeType {
 						action: 'Get many schedules',
 					},
 					{
+						name: 'Get',
+						value: 'get',
+						action: 'Get a schedule',
+					},
+					{
 						name: 'Create',
 						value: 'create',
 						action: 'Create a schedule',
@@ -867,7 +887,7 @@ export class ActualBudget implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['schedule'],
-						operation: ['update', 'delete'],
+						operation: ['update', 'delete', 'get'],
 					},
 				},
 			},
@@ -912,6 +932,11 @@ export class ActualBudget implements INodeType {
 						action: 'Get many transactions',
 					},
 					{
+						name: 'Get',
+						value: 'get',
+						action: 'Get a transaction',
+					},
+					{
 						name: 'Import',
 						value: 'import',
 						action: 'Import transactions',
@@ -950,7 +975,7 @@ export class ActualBudget implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['transaction'],
-						operation: ['update', 'delete'],
+						operation: ['update', 'delete', 'get'],
 					},
 				},
 			},
@@ -1153,6 +1178,16 @@ export class ActualBudget implements INodeType {
 						value: 'getIdByName',
 						action: 'Get ID by name',
 					},
+					{
+						name: 'Amount to Integer',
+						value: 'amountToInteger',
+						action: 'Convert amount to integer',
+					},
+					{
+						name: 'Integer to Amount',
+						value: 'integerToAmount',
+						action: 'Convert integer to amount',
+					},
 				],
 				default: 'sync',
 			},
@@ -1170,6 +1205,19 @@ export class ActualBudget implements INodeType {
 					show: {
 						resource: ['utility'],
 						operation: ['runBankSync'],
+					},
+				},
+			},
+			{
+				displayName: 'Amount',
+				name: 'amount',
+				type: 'number',
+				default: 0,
+				description: 'The amount to convert',
+				displayOptions: {
+					show: {
+						resource: ['utility'],
+						operation: ['amountToInteger', 'integerToAmount'],
 					},
 				},
 			},
@@ -1419,6 +1467,53 @@ export class ActualBudget implements INodeType {
 							case 'getAll':
 								result = await api.getAccounts();
 								break;
+							case 'close':
+								const accountIdToClose = this.getNodeParameter('accountId', i) as string;
+								await api.closeAccount(accountIdToClose);
+								result = { success: true };
+								break;
+							case 'create':
+								const name = this.getNodeParameter('name', i) as string;
+								const type = this.getNodeParameter('type', i) as string;
+								const offbudget = this.getNodeParameter('offbudget', i) as boolean;
+								const closed = this.getNodeParameter('closed', i) as boolean;
+								const account = {
+									name,
+									type,
+									offbudget,
+									closed,
+								};
+								result = await api.createAccount(account);
+								break;
+							case 'delete':
+								const accountIdForDelete = this.getNodeParameter('accountId', i) as string;
+								await api.deleteAccount(accountIdForDelete);
+								result = { success: true };
+								break;
+							case 'get':
+								const accountIdToGet = this.getNodeParameter('accountId', i) as string;
+								result = await api.getAccount(accountIdToGet);
+								break;
+							case 'reopen':
+								const accountIdToReopen = this.getNodeParameter('accountId', i) as string;
+								await api.reopenAccount(accountIdToReopen);
+								result = { success: true };
+								break;
+							case 'update':
+								const accountIdToUpdate = this.getNodeParameter('accountId', i) as string;
+								const name = this.getNodeParameter('name', i) as string;
+								const type = this.getNodeParameter('type', i) as string;
+								const offbudget = this.getNodeParameter('offbudget', i) as boolean;
+								const closed = this.getNodeParameter('closed', i) as boolean;
+								const account = {
+									name,
+									type,
+									offbudget,
+									closed,
+								};
+								await api.updateAccount(accountIdToUpdate, account);
+								result = { success: true };
+								break;
 							// Add other account operations here
 							default:
 								throw new NodeApiError(this.getNode(), {
@@ -1517,6 +1612,10 @@ export class ActualBudget implements INodeType {
 								await api.deleteTransaction(transactionIdForDelete);
 								result = { success: true };
 								break;
+							case 'get':
+								const transactionIdToGet = this.getNodeParameter('transactionId', i) as string;
+								result = await api.getTransaction(transactionIdToGet);
+								break;
 							default:
 								throw new NodeApiError(this.getNode(), {
 									message: `Unknown operation ${operation} for resource ${resource}`,
@@ -1587,6 +1686,120 @@ export class ActualBudget implements INodeType {
 								});
 						}
 						break;
+					case 'payee':
+						switch (operation) {
+							case 'create':
+								const name = this.getNodeParameter('name', i) as string;
+								const transferAccountId = this.getNodeParameter('transferAccountId', i) as string;
+								const payee = {
+									name,
+									transfer_acct: transferAccountId,
+								};
+								result = await api.createPayee(payee);
+								break;
+							case 'delete':
+								const payeeIdForDelete = this.getNodeParameter('payeeId', i) as string;
+								await api.deletePayee(payeeIdForDelete);
+								result = { success: true };
+								break;
+							case 'get':
+								const payeeIdToGet = this.getNodeParameter('payeeId', i) as string;
+								result = await api.getPayee(payeeIdToGet);
+								break;
+							case 'update':
+								const payeeIdToUpdate = this.getNodeParameter('payeeId', i) as string;
+								const name = this.getNodeParameter('name', i) as string;
+								const transferAccountId = this.getNodeParameter('transferAccountId', i) as string;
+								const payee = {
+									name,
+									transfer_acct: transferAccountId,
+								};
+								await api.updatePayee(payeeIdToUpdate, payee);
+								result = { success: true };
+								break;
+						}
+						break;
+					case 'rule':
+						switch (operation) {
+							case 'create':
+								const stage = this.getNodeParameter('stage', i) as string;
+								const conditions = this.getNodeParameter('conditions', i) as any[];
+								const actions = this.getNodeParameter('actions', i) as any[];
+								const conditionsOp = this.getNodeParameter('conditionsOp', i) as string;
+								const rule = {
+									stage,
+									conditions,
+									actions,
+									'conditions-op': conditionsOp,
+								};
+								result = await api.createRule(rule);
+								break;
+							case 'delete':
+								const ruleIdToDelete = this.getNodeParameter('ruleId', i) as string;
+								await api.deleteRule(ruleIdToDelete);
+								result = { success: true };
+								break;
+							case 'get':
+								const ruleIdToGet = this.getNodeParameter('ruleId', i) as string;
+								result = await api.getRule(ruleIdToGet);
+								break;
+							case 'update':
+								const ruleIdToUpdate = this.getNodeParameter('ruleId', i) as string;
+								const stage = this.getNodeParameter('stage', i) as string;
+								const conditions = this.getNodeParameter('conditions', i) as any[];
+								const actions = this.getNodeParameter('actions', i) as any[];
+								const conditionsOp = this.getNodeParameter('conditionsOp', i) as string;
+								const rule = {
+									id: ruleIdToUpdate,
+									stage,
+									conditions,
+									actions,
+									'conditions-op': conditionsOp,
+								};
+								await api.updateRule(rule);
+								result = { success: true };
+								break;
+						}
+						break;
+					case 'schedule':
+						switch (operation) {
+							case 'create':
+								const scheduleDetails = this.getNodeParameter('scheduleDetails', i) as object;
+								result = await api.createSchedule(scheduleDetails);
+								break;
+							case 'delete':
+								const scheduleIdToDelete = this.getNodeParameter('scheduleId', i) as string;
+								await api.deleteSchedule(scheduleIdToDelete);
+								result = { success: true };
+								break;
+							                                break;
+							                            case 'update':
+							                                const scheduleIdToUpdate = this.getNodeParameter('scheduleId', i) as string;
+							                                const scheduleDetails = this.getNodeParameter('scheduleDetails', i) as object;
+							                                await api.updateSchedule(scheduleIdToUpdate, scheduleDetails);
+							                                result = { success: true };
+							                                break;
+							                        }						break;
+					case 'utility':
+						switch (operation) {
+							case 'runQuery':
+								const query = this.getNodeParameter('query', i) as any;
+								result = await api.runQuery(query);
+								break;
+							case 'sync':
+								await api.sync();
+								result = { success: true };
+								break;
+							                                break;
+							                            							case 'amountToInteger':
+							                            								const amount = this.getNodeParameter('amount', i) as number;
+							                            								result = api.utils.amountToInteger(amount);
+							                            								break;
+							                            							case 'integerToAmount':
+							                            								const amount = this.getNodeParameter('amount', i) as number;
+							                            								result = api.utils.integerToAmount(amount);
+							                            								break;
+							                            						}						break;
 					// Add other resource cases here
 					default:
 						throw new NodeApiError(this.getNode(), {
