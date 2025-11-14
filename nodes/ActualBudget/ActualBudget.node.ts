@@ -1607,7 +1607,10 @@ export class ActualBudget implements INodeType {
 								result = await api.getCategoryGroups();
 								break;
 							case 'delete':
-								const categoryGroupIdForDelete = this.getNodeParameter('categoryGroupId', i) as string;
+								const categoryGroupIdForDelete = this.getNodeParameter(
+									'categoryGroupId',
+									i,
+								) as string;
 								await api.deleteCategoryGroup(categoryGroupIdForDelete);
 								result = { success: true };
 								break;
@@ -1621,7 +1624,10 @@ export class ActualBudget implements INodeType {
 						switch (operation) {
 							case 'create':
 								const nameForCreate = this.getNodeParameter('name', i) as string;
-								const transferAccountIdForCreate = this.getNodeParameter('transferAccountId', i) as string;
+								const transferAccountIdForCreate = this.getNodeParameter(
+									'transferAccountId',
+									i,
+								) as string;
 								result = await api.createPayee({
 									name: nameForCreate,
 									transfer_acct: transferAccountIdForCreate || undefined,
@@ -1660,7 +1666,10 @@ export class ActualBudget implements INodeType {
 							case 'update':
 								const payeeIdForUpdate = this.getNodeParameter('payeeId', i) as string;
 								const nameForUpdate = this.getNodeParameter('name', i) as string;
-								const transferAccountIdForUpdate = this.getNodeParameter('transferAccountId', i) as string;
+								const transferAccountIdForUpdate = this.getNodeParameter(
+									'transferAccountId',
+									i,
+								) as string;
 
 								const fieldsToUpdate: { name?: string; transfer_acct?: string } = {};
 								if (nameForUpdate) {
@@ -1682,6 +1691,39 @@ export class ActualBudget implements INodeType {
 						switch (operation) {
 							case 'getAll':
 								result = await api.getRules();
+								break;
+							case 'create':
+								const stageForCreate = this.getNodeParameter('stage', i) as any;
+								const conditionsForCreate = this.getNodeParameter('conditions', i) as any[];
+								const actionsForCreate = this.getNodeParameter('actions', i) as any[];
+								const conditionsOpForCreate = this.getNodeParameter('conditionsOp', i) as any;
+								result = await api.createRule({
+									stage: stageForCreate,
+									conditions: conditionsForCreate,
+									actions: actionsForCreate,
+									conditionsOp: conditionsOpForCreate,
+								});
+								break;
+							case 'update':
+								const ruleIdForUpdate = this.getNodeParameter('ruleId', i) as string;
+								const stageForUpdate = this.getNodeParameter('stage', i) as any;
+								const conditionsForUpdate = this.getNodeParameter('conditions', i) as any[];
+								const actionsForUpdate = this.getNodeParameter('actions', i) as any[];
+								const conditionsOpForUpdate = this.getNodeParameter('conditionsOp', i) as any;
+								                                const updatedRule = {
+								                                    id: ruleIdForUpdate, // Include the ID in the rule object
+								                                    stage: stageForUpdate,
+								                                    conditions: conditionsForUpdate,
+								                                    actions: actionsForUpdate,
+								                                    conditionsOp: conditionsOpForUpdate,
+								                                };
+								
+								                                await api.updateRule(updatedRule); // Pass the single rule object								result = { success: true };
+								break;
+							case 'delete':
+								const ruleIdForDelete = this.getNodeParameter('ruleId', i) as string;
+								await api.deleteRule(ruleIdForDelete);
+								result = { success: true };
 								break;
 							default:
 								throw new NodeApiError(this.getNode(), {

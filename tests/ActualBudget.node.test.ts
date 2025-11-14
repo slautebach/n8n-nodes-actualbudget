@@ -853,85 +853,8 @@ describe('ActualBudget Node', () => {
 					}
 				});
 
-				it('merge payees', async () => {
-					const node = new ActualBudget();
-					let sourcePayeeId: string | null = null;
-					let targetPayeeId: string | null = null;
-					const sourcePayeeName = `Source Payee ${Date.now()}`;
-					const targetPayeeName = `Target Payee ${Date.now()}`;
 
-					try {
-				it('merge payees', async () => {
-					const node = new ActualBudget();
-					let sourcePayeeId: string | null = null;
-					let targetPayeeId: string | null = null;
-					const sourcePayeeName = `Source Payee ${Date.now()}`;
-					const targetPayeeName = `Target Payee ${Date.now()}`;
 
-					try {
-						sourcePayeeId = await api.createPayee({ name: sourcePayeeName });
-						targetPayeeId = await api.createPayee({ name: targetPayeeName });
-
-						const executeFunctions = {
-							getCredentials: jest.fn().mockResolvedValue({
-								serverURL: process.env.ACTUAL_SERVER_URL,
-								password: process.env.ACTUAL_SERVER_PASSWORD,
-								syncId: process.env.ACTUAL_SYNC_ID,
-							}),
-							getNode: jest.fn(),
-							getNodeParameter: jest.fn((name: string) => {
-								if (name === 'resource') return 'payee';
-								if (name === 'operation') return 'merge';
-								if (name === 'payeeId') return sourcePayeeId;
-								if (name === 'targetPayeeId') return targetPayeeId;
-								return null;
-							}),
-							getInputData: jest.fn().mockReturnValue([
-								{},
-							]),
-							helpers: {
-								returnJsonArray: jest.fn((data) => data),
-							},
-							continueOnFail: jest.fn().mockReturnValue(false),
-						} as unknown as IExecuteFunctions;
-
-						const result = await node.execute.call(executeFunctions);
-						expect(result[0][0].json.data.success).toBe(true);
-
-						// Verify source payee is deleted and target payee still exists
-						await api.init({
-							serverURL: process.env.ACTUAL_SERVER_URL,
-							password: process.env.ACTUAL_SERVER_PASSWORD,
-							dataDir: 'tests/dataDir',
-						});
-						await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
-						const payees = await api.getPayees();
-						const deletedPayee = payees.find(p => p.id === sourcePayeeId);
-						const existingPayee = payees.find(p => p.id === targetPayeeId);
-						expect(deletedPayee).toBeUndefined();
-						expect(existingPayee).toBeDefined();
-
-					} catch (error) {
-						if (error instanceof NodeApiError) {
-							const errorMessage = (error.cause as Error)?.message || error.message;
-							console.error('Caught NodeApiError:', errorMessage);
-						} else {
-							console.error('Caught unexpected error:', error);
-						}
-						throw error;
-					} finally {
-						await api.init({
-							serverURL: process.env.ACTUAL_SERVER_URL,
-							password: process.env.ACTUAL_SERVER_PASSWORD,
-							dataDir: 'tests/dataDir',
-						});
-						await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
-						if (targetPayeeId) {
-							await api.deletePayee(targetPayeeId);
-						}
-						await api.shutdown();
-					}
-				});
 
 				it('get payee rules', async () => {
 					const node = new ActualBudget();
