@@ -1467,9 +1467,73 @@ export class ActualBudget implements INodeType {
 								});
 						}
 						break;
+					case 'category':
+						switch (operation) {
+							case 'getAll':
+								result = await api.getCategories();
+								break;
+							case 'create':
+								const nameForCreate = this.getNodeParameter('name', i) as string;
+								const groupIdForCreate = this.getNodeParameter('categoryGroupId', i) as string;
+								result = await api.createCategory({
+									name: nameForCreate,
+									group_id: groupIdForCreate,
+								});
+								break;
+							case 'update':
+								const categoryIdForUpdate = this.getNodeParameter('categoryId', i) as string;
+								const nameForUpdate = this.getNodeParameter('name', i) as string;
+								const groupIdForUpdate = this.getNodeParameter('categoryGroupId', i) as string;
+								await api.updateCategory(categoryIdForUpdate, {
+									name: nameForUpdate,
+									group_id: groupIdForUpdate,
+								});
+								result = { success: true };
+								break;
+							case 'delete':
+								const categoryIdForDelete = this.getNodeParameter('categoryId', i) as string;
+								await api.deleteCategory(categoryIdForDelete);
+								result = { success: true };
+								break;
+							default:
+								throw new NodeApiError(this.getNode(), {
+									message: `Unknown operation ${operation} for resource ${resource}`,
+								});
+						}
+						break;
+					case 'categoryGroup':
+						switch (operation) {
+							case 'getAll':
+								result = await api.getCategoryGroups();
+								break;
+							case 'create':
+								const nameForCreate = this.getNodeParameter('name', i) as string;
+								result = await api.createCategoryGroup({
+									name: nameForCreate,
+								});
+								break;
+							case 'update':
+								const groupIdForUpdate = this.getNodeParameter('categoryGroupId', i) as string;
+								const nameForUpdate = this.getNodeParameter('name', i) as string;
+								await api.updateCategoryGroup(groupIdForUpdate, {
+									name: nameForUpdate,
+								});
+								result = { success: true };
+								break;
+							case 'delete':
+								const groupIdForDelete = this.getNodeParameter('categoryGroupId', i) as string;
+								await api.deleteCategoryGroup(groupIdForDelete);
+								result = { success: true };
+								break;
+							default:
+								throw new NodeApiError(this.getNode(), {
+									message: `Unknown operation ${operation} for resource ${resource}`,
+								});
+						}
+						break;
 					// Add other resource cases here
 					default:
-						throw new NodeApiError(this.getNode(), { message: `Unknown resource ${resource}` });
+						throw new NodeApiError(this.getNode(), { message: `Not implemented or unknown resource ${resource}` });
 				}
 
 				returnData.push({ json: { data: result } });

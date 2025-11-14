@@ -416,7 +416,7 @@ describe('ActualBudget Node', () => {
 				await api.shutdown();
 			});
 
-			it('getTransactions should return transactions from a live server', async () => {
+			it('get transactions should return transactions from a live server', async () => {
 				const node = new ActualBudget();
 				let testAccountId: string | null = null;
 
@@ -488,6 +488,400 @@ describe('ActualBudget Node', () => {
 						await api.shutdown();
 					}
 				}
+			});
+
+			describe('Category Operations', () => {
+				let testGroupId: string | null = null;
+				let testCategoryId: string | null = null;
+				const groupName = `Test Group ${Date.now()}`;
+				const categoryName = `Test Category ${Date.now()}`;
+
+				beforeEach(async () => {
+					testGroupId = await api.createCategoryGroup({ name: groupName });
+					testCategoryId = await api.createCategory({ name: categoryName, group_id: testGroupId as string });
+				});
+
+				afterEach(async () => {
+					// Clean up in reverse order of creation
+					await api.init({
+						serverURL: process.env.ACTUAL_SERVER_URL,
+						password: process.env.ACTUAL_SERVER_PASSWORD,
+						dataDir: 'tests/dataDir',
+					});
+					await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
+					if (testCategoryId) {
+						try {
+							await api.deleteCategory(testCategoryId);
+						} catch (e) {
+							// Ignore error if category was already deleted by the test
+						}
+					}
+					if (testGroupId) {
+						await api.deleteCategoryGroup(testGroupId);
+					}
+					await api.shutdown();
+				});
+
+				it('should get all categories', async () => {
+					const node = new ActualBudget();
+					const executeFunctions = {
+						getCredentials: jest.fn().mockResolvedValue({
+							serverURL: process.env.ACTUAL_SERVER_URL,
+							password: process.env.ACTUAL_SERVER_PASSWORD,
+							syncId: process.env.ACTUAL_SYNC_ID,
+						}),
+						getNode: jest.fn(),
+						getNodeParameter: jest.fn((name: string) => {
+							if (name === 'resource') return 'category';
+							if (name === 'operation') return 'getAll';
+							return null;
+						}),
+						getInputData: jest.fn().mockReturnValue([
+							{},
+						]),
+						helpers: {
+							returnJsonArray: jest.fn((data) => data),
+						},
+					} as unknown as IExecuteFunctions;
+
+					const result = await node.execute.call(executeFunctions);
+					const categories = result[0][0].json.data;
+					const testCategory = categories.find((c: any) => c.id === testCategoryId);
+					expect(testCategory).toBeDefined();
+					expect(testCategory.name).toBe(categoryName);
+				});
+
+				it('should create a category', async () => {
+					const node = new ActualBudget();
+					const newCategoryName = `New Test Category ${Date.now()}`;
+					const executeFunctions = {
+						getCredentials: jest.fn().mockResolvedValue({
+							serverURL: process.env.ACTUAL_SERVER_URL,
+							password: process.env.ACTUAL_SERVER_PASSWORD,
+							syncId: process.env.ACTUAL_SYNC_ID,
+						}),
+						getNode: jest.fn(),
+						getNodeParameter: jest.fn((name: string) => {
+							if (name === 'resource') return 'category';
+							if (name === 'operation') return 'create';
+							if (name === 'name') return newCategoryName;
+							if (name === 'categoryGroupId') return testGroupId;
+							return null;
+						}),
+						getInputData: jest.fn().mockReturnValue([
+							{},
+						]),
+						helpers: {
+							returnJsonArray: jest.fn((data) => data),
+						},
+					} as unknown as IExecuteFunctions;
+
+					const result = await node.execute.call(executeFunctions);
+					const newCategoryId = result[0][0].json.data;
+					expect(newCategoryId).toBeDefined();
+
+					// Re-init API for verification and cleanup
+					await api.init({
+						serverURL: process.env.ACTUAL_SERVER_URL,
+						password: process.env.ACTUAL_SERVER_PASSWORD,
+						dataDir: 'tests/dataDir',
+					});
+					await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
+
+					try {
+						// Verify the category was created
+						const categories = await api.getCategories();
+						const newCategory = categories.find((c: any) => c.id === newCategoryId);
+						expect(newCategory).toBeDefined();
+						expect(newCategory?.name).toBe(newCategoryName);
+					} finally {
+						// Clean up the newly created category
+						await api.deleteCategory(newCategoryId);
+						await api.shutdown();
+					}
+				});
+
+				it('should update a category', async () => {
+					const node = new ActualBudget();
+					const updatedCategoryName = `Updated Test Category ${Date.now()}`;
+					const executeFunctions = {
+						getCredentials: jest.fn().mockResolvedValue({
+							serverURL: process.env.ACTUAL_SERVER_URL,
+							password: process.env.ACTUAL_SERVER_PASSWORD,
+							syncId: process.env.ACTUAL_SYNC_ID,
+						}),
+						getNode: jest.fn(),
+						getNodeParameter: jest.fn((name: string) => {
+							if (name === 'resource') return 'category';
+							if (name === 'operation') return 'update';
+							if (name === 'categoryId') return testCategoryId;
+							if (name === 'name') return updatedCategoryName;
+							if (name === 'categoryGroupId') return testGroupId;
+							return null;
+						}),
+						getInputData: jest.fn().mockReturnValue([
+							{},
+						]),
+						helpers: {
+							returnJsonArray: jest.fn((data) => data),
+						},
+					} as unknown as IExecuteFunctions;
+
+					await node.execute.call(executeFunctions);
+
+					// Re-init API for verification
+					await api.init({
+						serverURL: process.env.ACTUAL_SERVER_URL,
+						password: process.env.ACTUAL_SERVER_PASSWORD,
+						dataDir: 'tests/dataDir',
+					});
+					await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
+
+					// Verify the category was updated
+					const categories = await api.getCategories();
+					const updatedCategory = categories.find((c: any) => c.id === testCategoryId);
+					expect(updatedCategory).toBeDefined();
+					expect(updatedCategory?.name).toBe(updatedCategoryName);
+
+					await api.shutdown();
+				});
+
+				it('should delete a category', async () => {
+					const node = new ActualBudget();
+					const executeFunctions = {
+						getCredentials: jest.fn().mockResolvedValue({
+							serverURL: process.env.ACTUAL_SERVER_URL,
+							password: process.env.ACTUAL_SERVER_PASSWORD,
+							syncId: process.env.ACTUAL_SYNC_ID,
+						}),
+						getNode: jest.fn(),
+						getNodeParameter: jest.fn((name: string) => {
+							if (name === 'resource') return 'category';
+							if (name === 'operation') return 'delete';
+							if (name === 'categoryId') return testCategoryId;
+							return null;
+						}),
+						getInputData: jest.fn().mockReturnValue([
+							{},
+						]),
+						helpers: {
+							returnJsonArray: jest.fn((data) => data),
+						},
+					} as unknown as IExecuteFunctions;
+
+					await node.execute.call(executeFunctions);
+
+					// Re-init API for verification
+					await api.init({
+						serverURL: process.env.ACTUAL_SERVER_URL,
+						password: process.env.ACTUAL_SERVER_PASSWORD,
+						dataDir: 'tests/dataDir',
+					});
+					await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
+
+					// Verify the category was deleted
+					const categories = await api.getCategories();
+					const deletedCategory = categories.find((c: any) => c.id === testCategoryId);
+					expect(deletedCategory).toBeUndefined();
+
+					// Prevent afterEach from trying to delete it again
+					testCategoryId = null;
+
+					await api.shutdown();
+				});
+			});
+
+			describe('Category Group Operations', () => {
+				let testGroupId: string | null = null;
+				const groupName = `Test Group ${Date.now()}`;
+
+				beforeEach(async () => {
+					testGroupId = await api.createCategoryGroup({ name: groupName });
+				});
+
+				afterEach(async () => {
+					// Clean up
+					await api.init({
+						serverURL: process.env.ACTUAL_SERVER_URL,
+						password: process.env.ACTUAL_SERVER_PASSWORD,
+						dataDir: 'tests/dataDir',
+					});
+					await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
+					if (testGroupId) {
+						try {
+							await api.deleteCategoryGroup(testGroupId);
+						} catch (e) {
+							// Ignore error if group was already deleted by the test
+						}
+					}
+					await api.shutdown();
+				});
+
+				it('should get all category groups', async () => {
+					const node = new ActualBudget();
+					const executeFunctions = {
+						getCredentials: jest.fn().mockResolvedValue({
+							serverURL: process.env.ACTUAL_SERVER_URL,
+							password: process.env.ACTUAL_SERVER_PASSWORD,
+							syncId: process.env.ACTUAL_SYNC_ID,
+						}),
+						getNode: jest.fn(),
+						getNodeParameter: jest.fn((name: string) => {
+							if (name === 'resource') return 'categoryGroup';
+							if (name === 'operation') return 'getAll';
+							return null;
+						}),
+						getInputData: jest.fn().mockReturnValue([
+							{},
+						]),
+						helpers: {
+							returnJsonArray: jest.fn((data) => data),
+						},
+					} as unknown as IExecuteFunctions;
+
+					const result = await node.execute.call(executeFunctions);
+					const groups = result[0][0].json.data;
+					const testGroup = groups.find((g: any) => g.id === testGroupId);
+					expect(testGroup).toBeDefined();
+					expect(testGroup.name).toBe(groupName);
+				});
+
+				it('should create a category group', async () => {
+					const node = new ActualBudget();
+					const newGroupName = `New Test Group ${Date.now()}`;
+					const executeFunctions = {
+						getCredentials: jest.fn().mockResolvedValue({
+							serverURL: process.env.ACTUAL_SERVER_URL,
+							password: process.env.ACTUAL_SERVER_PASSWORD,
+							syncId: process.env.ACTUAL_SYNC_ID,
+						}),
+						getNode: jest.fn(),
+						getNodeParameter: jest.fn((name: string) => {
+							if (name === 'resource') return 'categoryGroup';
+							if (name === 'operation') return 'create';
+							if (name === 'name') return newGroupName;
+							return null;
+						}),
+						getInputData: jest.fn().mockReturnValue([
+							{},
+						]),
+						helpers: {
+							returnJsonArray: jest.fn((data) => data),
+						},
+					} as unknown as IExecuteFunctions;
+
+					const result = await node.execute.call(executeFunctions);
+					const newGroupId = result[0][0].json.data;
+					expect(newGroupId).toBeDefined();
+
+					// Re-init API for verification and cleanup
+					await api.init({
+						serverURL: process.env.ACTUAL_SERVER_URL,
+						password: process.env.ACTUAL_SERVER_PASSWORD,
+						dataDir: 'tests/dataDir',
+					});
+					await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
+
+					try {
+						// Verify the group was created
+						const groups = await api.getCategoryGroups();
+						const newGroup = groups.find((g: any) => g.id === newGroupId);
+						expect(newGroup).toBeDefined();
+						expect(newGroup?.name).toBe(newGroupName);
+					} finally {
+						// Clean up the newly created group
+						await api.deleteCategoryGroup(newGroupId);
+						await api.shutdown();
+					}
+				});
+
+				it('should update a category group', async () => {
+					const node = new ActualBudget();
+					const updatedGroupName = `Updated Test Group ${Date.now()}`;
+					const executeFunctions = {
+						getCredentials: jest.fn().mockResolvedValue({
+							serverURL: process.env.ACTUAL_SERVER_URL,
+							password: process.env.ACTUAL_SERVER_PASSWORD,
+							syncId: process.env.ACTUAL_SYNC_ID,
+						}),
+						getNode: jest.fn(),
+						getNodeParameter: jest.fn((name: string) => {
+							if (name === 'resource') return 'categoryGroup';
+							if (name === 'operation') return 'update';
+							if (name === 'categoryGroupId') return testGroupId;
+							if (name === 'name') return updatedGroupName;
+							return null;
+						}),
+						getInputData: jest.fn().mockReturnValue([
+							{},
+						]),
+						helpers: {
+							returnJsonArray: jest.fn((data) => data),
+						},
+					} as unknown as IExecuteFunctions;
+
+					await node.execute.call(executeFunctions);
+
+					// Re-init API for verification
+					await api.init({
+						serverURL: process.env.ACTUAL_SERVER_URL,
+						password: process.env.ACTUAL_SERVER_PASSWORD,
+						dataDir: 'tests/dataDir',
+					});
+					await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
+
+					// Verify the group was updated
+					const groups = await api.getCategoryGroups();
+					const updatedGroup = groups.find((g: any) => g.id === testGroupId);
+					expect(updatedGroup).toBeDefined();
+					expect(updatedGroup?.name).toBe(updatedGroupName);
+
+					await api.shutdown();
+				});
+
+				it('should delete a category group', async () => {
+					const node = new ActualBudget();
+					const executeFunctions = {
+						getCredentials: jest.fn().mockResolvedValue({
+							serverURL: process.env.ACTUAL_SERVER_URL,
+							password: process.env.ACTUAL_SERVER_PASSWORD,
+							syncId: process.env.ACTUAL_SYNC_ID,
+						}),
+						getNode: jest.fn(),
+						getNodeParameter: jest.fn((name: string) => {
+							if (name === 'resource') return 'categoryGroup';
+							if (name === 'operation') return 'delete';
+							if (name === 'categoryGroupId') return testGroupId;
+							return null;
+						}),
+						getInputData: jest.fn().mockReturnValue([
+							{},
+						]),
+						helpers: {
+							returnJsonArray: jest.fn((data) => data),
+						},
+					} as unknown as IExecuteFunctions;
+
+					await node.execute.call(executeFunctions);
+
+					// Re-init API for verification
+					await api.init({
+						serverURL: process.env.ACTUAL_SERVER_URL,
+						password: process.env.ACTUAL_SERVER_PASSWORD,
+						dataDir: 'tests/dataDir',
+					});
+					await api.downloadBudget(process.env.ACTUAL_SYNC_ID as string);
+
+					// Verify the group was deleted
+					const groups = await api.getCategoryGroups();
+					const deletedGroup = groups.find((g: any) => g.id === testGroupId);
+					expect(deletedGroup).toBeUndefined();
+
+					// Prevent afterEach from trying to delete it again
+					testGroupId = null;
+
+					await api.shutdown();
+				});
 			});
 		});
 	});
