@@ -1410,6 +1410,11 @@ export class ActualBudget implements INodeType {
 			const operation = this.getNodeParameter('operation', i) as string;
 
 			await ActualBudget.initApiClient.call(this);
+			const credentials = await this.getCredentials('actualBudgetApi');
+			const { syncId } = credentials as { syncId: string };
+			if (syncId) {
+				await api.downloadBudget(syncId);
+			}
 
 			try {
 				let result: any;
@@ -1650,10 +1655,15 @@ export class ActualBudget implements INodeType {
 								const payeeIdForUpdate = this.getNodeParameter('payeeId', i) as string;
 								const nameForUpdate = this.getNodeParameter('name', i) as string;
 								const transferAccountIdForUpdate = this.getNodeParameter('transferAccountId', i) as string;
-								await api.updatePayee(payeeIdForUpdate, {
-									name: nameForUpdate,
-									transfer_acct: transferAccountIdForUpdate || undefined,
-								});
+
+								const fieldsToUpdate: { name?: string; transfer_acct?: string } = {};
+								if (nameForUpdate) {
+									fieldsToUpdate.name = nameForUpdate;
+								}
+								if (transferAccountIdForUpdate) {
+									fieldsToUpdate.transfer_acct = transferAccountIdForUpdate;
+								}
+								await api.updatePayee(payeeIdForUpdate, fieldsToUpdate);
 								result = { success: true };
 								break;
 							default:
