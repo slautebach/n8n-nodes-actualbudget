@@ -1628,6 +1628,8 @@ export class ActualBudget implements INodeType {
 								const transactionIdToGet = this.getNodeParameter('transactionId', i) as string;
 								const transactions = await api.getTransactions(
 									this.getNodeParameter('accountId', i) as string,
+									'',
+									'',
 								);
 								result = transactions.find((t: any) => t.id === transactionIdToGet);
 								break;
@@ -1817,24 +1819,33 @@ export class ActualBudget implements INodeType {
 						break;
 					case 'utility':
 						switch (operation) {
-							case 'runQuery':
+							case 'runQuery': {
 								const query = this.getNodeParameter('query', i) as any;
 								result = await api.runQuery(query);
 								break;
+							}
 							case 'sync':
 								await api.sync();
 								result = { success: true };
 								break;
-							                                break;
-							                            							case 'amountToInteger':
-							                            								const amount = this.getNodeParameter('amount', i) as number;
-							                            								result = api.utils.amountToInteger(amount);
-							                            								break;
-							                            							case 'integerToAmount':
-							                            								const amount = this.getNodeParameter('amount', i) as number;
-							                            								result = api.utils.integerToAmount(amount);
-							                            								break;
-							                            						}						break;
+							case 'runBankSync': {
+								const accountId = this.getNodeParameter('accountId', i) as string;
+								await api.runBankSync({ accountId });
+								result = { success: true };
+								break;
+							}
+							case 'amountToInteger': {
+								const amount = this.getNodeParameter('amount', i) as number;
+								result = api.utils.amountToInteger(amount);
+								break;
+							}
+							case 'integerToAmount': {
+								const amount = this.getNodeParameter('amount', i) as number;
+								result = api.utils.integerToAmount(amount);
+								break;
+							}
+						}
+						break;
 					// Add other resource cases here
 					default:
 						throw new NodeApiError(this.getNode(), {
