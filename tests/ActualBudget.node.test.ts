@@ -440,6 +440,7 @@ describe('ActualBudget Node', () => {
 							if (name === 'accountId') return testAccountId;
 							if (name === 'startDate') return '2023-01-01';
 							if (name === 'endDate') return '2023-12-31';
+							if (name === 'budgetId') return process.env.ACTUAL_BUDGET_ID;
 							return null;
 						}),
 						getInputData: jest.fn().mockReturnValue([
